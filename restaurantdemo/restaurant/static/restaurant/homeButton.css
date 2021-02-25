@@ -1,0 +1,9 @@
+.homeButtonContainer{
+    position: absolute;
+    left: 20px;
+}
+
+.homeButtonImage{
+    max-height: 55px;
+    border-radius: 50%;
+}

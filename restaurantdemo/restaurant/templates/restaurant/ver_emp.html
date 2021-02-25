@@ -1,0 +1,71 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ver Empleado</title>
+
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/verEmp.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h2>Empleado .- </h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label for=""><strong>Nombre: </strong> {{emp.emp_nombre}}</label>
+                    </div>
+                    <div class="col-md-4">
+                        <label for=""><strong>Apellido paterno: </strong> {{emp.emp_apellidop}}</label>
+                    </div>
+                    <div class="col-md-4">
+                        <label for=""><strong>Apellido materno: </strong> {{emp.emp_apellidom}}</label>
+                    </div>
+                    <div class="col-md-4">
+                        <label for=""><strong>CI: </strong> {{emp.emp_ci}}</label>
+                    </div>
+                    <div class="col-md-4">
+                        <label for=""><strong>Nro celular: </strong> {{emp.emp_celular}}</label>
+                    </div>
+                    <div class="col-md-4">
+                        <label for=""><strong>Direccion: </strong> {{emp.emp_direccion}}</label>
+                    </div>
+                    <div class="col-md-12">
+                        <label for=""><strong>Sueldo: </strong> {{emp.emp_sueldo}}</label>
+                    </div>
+                </div>
+                {% if tieneUser %}
+                <hr>
+                <h4>Usuario.- </h4>
+                <div class="row">
+                    <div class="col-md-4">
+                        <label for=""><strong>Nombre de usuario: </strong>{{user.usu_nombre}}</label>
+                    </div>
+                    <div class="col-md-4">
+                        <label for=""><strong>Contraseña: </strong>{{user.usu_contra}}</label>
+                    </div>
+                </div>
+                {% endif %}
+                <hr>
+                <h4>Cargos.- </h4>
+                <div class="row">
+                    {% for c in cargos%}
+                        <div class="col-md-12">
+                            <label for="">{{c.car_nombre}}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="card-footer">
+                <a class="btn btn-outline-primary" href="{% url 'restaurant:vistaemps' %}">Volver a empleados</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

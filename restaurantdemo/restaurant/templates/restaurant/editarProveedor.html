@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'fontAwesome/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/gestProveedor.css' %}">
+</head>
+
+<body>
+    <div class="container">
+
+        <form action="{% url 'restaurant:gestionarProveedores' %}" method="POST">
+            {% csrf_token %}
+            <div class="card regProvCard">
+                <div class="card-header">
+                    <h4>Editar proveedor.-</h4>
+                </div>
+                <div class="card-body">
+
+                    <div class="form-group">
+                        <input type="text" value="{{prv.pro_nombre}}" maxlength="20" placeholder="nombre" name="pro_nombre" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <input type="text" maxlength="70" value="{{prv.pro_direccion}}" placeholder="direccion" name="pro_direccion"
+                            class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <input type="text" maxlength="10" value="{{prv.pro_celular}}" placeholder="celular" name="pro_celular"
+                            class="form-control" />
+                    </div>
+                    <button name="editarProv" value="{{prv.pro_id}}" class="btn btn-primary">guardar cambios</button>
+
+                </div>
+
+                <div class="card-footer">
+                    <a class="btn btn-secondary" href="{% url 'restaurant:gestionarProveedores' %}">Cancelar</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
+
+</html>

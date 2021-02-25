@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar NIT's.-</title>
+
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'fontAwesome/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/homeButton.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/gestNits.css' %}">
+
+    <script type="text/javascript" src="{% static 'bootstrap/jquery-3.5.1.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/popper.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/bootstrap.min.js' %}"></script>
+</head>
+
+<body>
+    <div class="container">
+        <form action="{% url 'restaurant:gestionarNit' %}" method="POST">
+            {% csrf_token %}
+            <div class="homeButtonContainer">
+                <a href="{% url 'restaurant:home' %}"><img class="homeButtonImage"
+                        src="{% static 'restaurant/restaurantIcon.jpg' %}" alt="Restaurante Los Abuelos"></a>
+            </div>
+            <div class="gnitHeader">
+                <h3>Gestionar Nit.- </h3>
+                <p>Agregar nuevo nit
+                    <button name="registrarBtn" class="btn btn-primary">
+                        <i class="fas fa-plus-circle"></i>
+                    </button>
+                </p>
+            </div>
+            <div class="gnitBody">
+                <h4>Nit's registrados.- </h4>
+                <p>Los nit van en los pedidos a pedido de los clientes que visitan el <br />
+                    restaurant, no todos solicitan pedidos con nit.
+                </p>
+                <br />
+                <div class="row">
+                    <div class="col-md-4">
+                        <h4>Numero</h4>
+                    </div>
+                    <div class="col-md-4">
+                        <h4>Dueño</h4>
+                    </div>
+                </div>
+                <br/> <br/>
+                {% for n in nits %}
+                <div class="row">
+                    <div class="col-md-4">
+                        <label for="">{{n.nit_numero}}</label>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="">{{n.nit_dueno}}</label>
+                    </div>
+                    <div class="col-md-4">
+                        <button name="editarBtn" value="{{n.nit_id}}" class="btn btn-info">
+                            Editar
+                        </button>
+                    </div>
+                </div>
+                <hr>
+                {% endfor %}
+            </div>
+        </form>
+    </div>
+</body>
+
+</html>

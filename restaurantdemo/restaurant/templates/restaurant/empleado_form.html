@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo empleado</title>
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/homeButton.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/editEmpleado.css' %}">
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="homeButtonContainer">
+            <a href="{% url 'restaurant:home' %}"><img class="homeButtonImage"
+                    src="{% static 'restaurant/restaurantIcon.jpg' %}" alt="Restaurante Los Abuelos"></a>
+        </div>
+        <div class="card" style="width: 70%; margin:auto">
+            <form action="{% url 'restaurant:regemp' %}" method="POST">
+                {% csrf_token %}
+                <div class="card-header">
+                    <h1>Bienvenido nuevo empleado.-</h1>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <h4>Datos personales</h4>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" maxlength="30" class="form-control" placeholder="Nombre" , name="emp_nombre">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" maxlength="20" class="form-control" placeholder="Apellido paterno"
+                            name="emp_ap">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" maxlength="20" class="form-control" placeholder="Apellido materno"
+                            name="emp_am">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Numero de carnet de identidad"
+                            name="emp_ci">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" maxlength="10" class="form-control" placeholder="Nro celular" name="emp_cel">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" maxlength="30" class="form-control" placeholder="Direccion" name="emp_dir">
+                    </div>
+
+                    <div class="form-group">
+                        <h4>Datos de empleado</h4>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" name="emp_sueldo" class="form-control" placeholder="Sueldo">
+                    </div>
+                    <h4>Cargos</h4>
+                    <div class="cargos_section">
+                        {% for c in cargos %}
+                        <input id="{{c.car_id}}" type="checkbox" name="{{c.car_nombre}}" value="{{c.car_id}}" class="form-check-input">
+                        <label for="{{c.car_id}}">{{ c.car_nombre }}</label>
+                        <br/>
+                        <br/>
+                        {% endfor %}
+                    </div>
+
+                    <button class="btn btn-outline-dark">Registrar</button>
+                    <br /><br />
+                    <label style="color:{{mcolor}}" for="">{{msg}}
+                    </label>
+            </form>
+        </div>
+    </div>
+    </div>
+</body>
+
+</html>

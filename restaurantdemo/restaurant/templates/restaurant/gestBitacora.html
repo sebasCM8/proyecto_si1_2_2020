@@ -1,0 +1,134 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Bitacora</title>
+
+    <link rel="stylesheet" href="{% static 'fontAwesome/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/gestBitacora.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/homeButton.css' %}">
+
+    <script type="text/javascript" src="{% static 'bootstrap/jquery-3.5.1.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/popper.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/bootstrap.min.js' %}"></script>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="homeButtonContainer">
+            <a href="{% url 'restaurant:home' %}"><img class="homeButtonImage"
+                    src="{% static 'restaurant/restaurantIcon.jpg' %}" alt="Restaurante Los Abuelos"></a>
+        </div>
+        <div class="gbitacoraHeader">
+            <h1>Gestionar Bitacora</h1>
+            <p>La bitacora es un historial de acciones que los usuarios realizan en el sistema.
+                <br> Puede ver que y cuando un usuario realizo una accion.
+            </p>
+        </div>
+        <div class="gbitacoraBody">
+            <form action="{% url 'restaurant:gestionarBitacora' %}" method="POST">
+                {% csrf_token %}
+                <h3>Filtrar por:</h3> 
+                <p>Seleccione los valores en los filtros y luego presione buscar.</p><br />
+                <div class="row">
+                    <div class="col-md-4">
+                        <button class="btn btn-light" type="button" data-toggle="collapse" data-target="#accionf"
+                            aria-expanded="false" aria-controls="accionf">
+                            Accion
+                        </button> <br />
+                        <div class="collapse" id="accionf">
+                            {% for a in acciones %}
+                            <div class="form-check">
+                                <input type="radio" name="acc_id" id="{{a.acc_id}}" value="{{ a.acc_id }}"
+                                    class="form-check-input">
+                                <label for="{{a.acc_id}}" class="form-check-label">{{a.acc_nombre}}</label>
+                                <hr>
+                            </div>
+                            {% endfor %}
+                            <div class="form-check">
+                                <input type="radio" name="acc_id" id="0" value="0"
+                                    class="form-check-input">
+                                <label for="0" class="form-check-label">Todas</label>
+                                <hr>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-light" type="button" data-toggle="collapse" data-target="#usuariof"
+                            aria-expanded="false" aria-controls="usuariof">
+                            Usuarios
+                        </button> <br />
+                        <div class="collapse" id="usuariof">
+                            {% for u in usuarios %}
+                            <div class="form-check">
+                                <input type="radio" name="usu_nombre" id="{{u.usu_nombre}}" value="{{ u.usu_nombre }}"
+                                    class="form-check-input">
+                                <label for="{{u.usu_nombre}}" class="form-check-label">{{u.usu_nombre}}</label>
+                                <hr>
+                            </div>
+                            {% endfor %}
+                            <div class="form-check">
+                                <input type="radio" name="usu_nombre" id="todos" value="todos"
+                                    class="form-check-input">
+                                <label for="todos" class="form-check-label">todos</label>
+                                <hr>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <button name="afiltro" class="btn btn-primary">
+                           Buscar <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <br/>
+            </form>
+            
+            {% if hay %}
+            <div class="row">
+                <div class="col-md-3">
+                    <h4>Usuario</h4>
+                </div>
+                <div class="col-md-3">
+                    <h4>
+                        Accion
+                    </h4>
+                </div>
+                <div class="col-md-3">
+                    <h4>Fecha</h4>
+                </div>
+                <div class="col-md-3">
+                    <h4>Hora</h4>
+                </div>
+            </div>
+            {% for b in bitacora %}
+            <div class="row">
+                <div class="col-md-3">
+                    <label for="">{{b.usuario}}</label>
+                </div>
+                <div class="col-md-3">
+                    <label for="">{{b.accion}}</label>
+                </div>
+                <div class="col-md-3">
+                    <label for="">{{b.fecha}}</label>
+                </div>
+                <div class="col-md-3">
+                    <label for="">{{b.hora}}</label>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <h4>No hay registros con esos valores...</h4>
+            {% endif %}
+        </div>
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,57 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/perfil.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/homeButton.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="homeButtonContainer">
+            <a href="{% url 'restaurant:home' %}"><img class="homeButtonImage"
+                    src="{% static 'restaurant/restaurantIcon.jpg' %}" alt="Restaurante Los Abuelos"></a>
+        </div>
+        <div class="perfilHeader">
+            <h2>Perfil de usuario: <span>{{user.usu_nombre}}</span></h2>
+        </div>
+        <div class="perfilBody">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6"><strong>Contraseña:</strong> {{user.usu_contra}}</div>
+                        <div class="col-md-6"><strong>Nombre:</strong> {{empleado.emp_nombre}} {{empleado.emp_apellidop}} {{empleado.emp_apellidom}}</div>
+                        <div class="col-md-4"><strong>Celular:</strong> {{empleado.emp_celular}}</div>
+                        <div class="col-md-4"><strong>Direccion:</strong> {{empleado.emp_direccion}}</div>
+                        <div class="col-md-4"><strong>Sueldo:</strong> {{empleado.emp_sueldo}}</div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="cargosSection">
+                                <h3>Cargos</h3>
+                                {% for c in cargos %}
+                                <label for="">{{c.car_nombre}}</label>
+                                <br/>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <form action="{% url 'restaurant:perfil' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="card-footer">
+                        <button class="btn btn-primary" value="{{user.usu_id}}" name="editar">Editar perfil</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

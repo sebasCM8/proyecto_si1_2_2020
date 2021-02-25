@@ -1,0 +1,30 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eliminar Empleado</title>
+
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/eliminarPage.css' %}">
+</head>
+
+<body>
+    <div class="container">
+        <form action="{% url 'restaurant:eliminarEmp' %}" method="POST">
+            {% csrf_token %}
+            <div class="mensajeEliminar">
+                <h2>Seguro que desea eliminar a {{emp.emp_nombre}} ?</h2>
+                <div class="row justify-content-center">
+                    <div class="col-md-auto"><button name="eliminar" value="{{emp.emp_ci}}" class="btn btn-outline-danger">Eliminar</button></div>
+                    <div class="col-md-auto"><button name="cancelar" class="btn btn-outline-dark">Cancelar</button></div>
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,70 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar usuario</title>
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/usuarioForm.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/homeButton.css' %}">
+
+    <script type="text/javascript" src="{% static 'bootstrap/jquery-3.5.1.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/popper.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/bootstrap.min.js' %}"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="homeButtonContainer">
+            <a href="{% url 'restaurant:home' %}"><img class="homeButtonImage" src="{% static 'restaurant/restaurantIcon.jpg' %}" alt="Restaurante Los Abuelos"></a>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h1>Registro de nuevo usuario.- </h1>
+            </div>
+            <div class="card-body">
+                <form action="{% url 'restaurant:regusu' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <input type="text" maxlength="20" class="form-control" placeholder="nombre de usuario" name="usu_nombre">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" maxlength="30" class="form-control" placeholder="contraseña" name="usu_contra">
+                    </div>
+                    {% if hayemps %}
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Empleado del usuario
+                        </button>
+
+
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            {% for emp in empleados %}
+                            <div class="form-group">
+                                <input type="radio" name="emp_id" id="{{emp.emp_id}}" value="{{ emp.emp_id }}"
+                                    class="form-check-input dropdown-item">
+                                <label style="font-size: large;" for="{{emp.emp_id}}"
+                                    class="form-check-label">{{emp.emp_nombre}}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <br />
+                    <button class="btn btn-outline-dark">Registrar usuario</button>
+                    {% else %}
+                    <label>No hay empleados disponibles para asignar un usuario nuevo..</label>
+                    {% endif %}
+                    <br />
+                    <br />
+                    <label style="color: {{colo}};" for="">{{msg}}</label>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

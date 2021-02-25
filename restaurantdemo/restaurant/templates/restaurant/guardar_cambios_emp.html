@@ -1,0 +1,26 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/eliminarPage.css' %}">
+</head>
+
+<body>
+    <div class="container">
+        <div class="mensaje">
+            <div class="mensajeEliminar">
+                <h1>Cambios Guardados en {{empleado.emp_nombre}}</h1>
+                <a href="{% url 'restaurant:vistaemps' %}" class="btn btn-outline-primary">OK</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,185 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurante Los Abuelos</title>
+
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/homePage.css' %}">
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="homeHeader">
+            <div class="row">
+                <div class="col-md-8">
+                    <h1>Restaurante Los abuelos</h1>
+                </div>
+                <div class="col-md-4">
+                    <div class="iconContainer">
+                        <img class="homeIcon" src="{% static 'restaurant/restaurantIcon.jpg' %}"
+                            alt="Restaurante Los Abuelos">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="homeSections">
+            <div class="sectionTitle">
+                <h2>Administrar Usuarios.- </h2>
+            </div>
+            <div class="row">
+                <div class="col-md-auto">
+                    <div class="sectionImage">
+                        <img src="{% static 'restaurant/usuarioImagenSection.png' %}" class="homeImage" alt="Seccion empleados">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="sectionAreas">
+                        <ul>
+                            <li><a href="{% url 'restaurant:regusu' %}">Registrar usuario</a></li>
+                            <li><a href="{% url 'restaurant:gestionarAccion' %}">Gestionar Accion</a></li>
+                            <li><a href="{% url 'restaurant:gestionarBitacora' %}">Gestionar Bitacora</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="homeSections">
+            <div class="sectionTitle">
+                <h2>Administrar Personal</h2>
+            </div>
+            <div class="row">
+                <div class="col-md-auto">
+                    <div class="sectionImage">
+                        <img src="{% static 'restaurant/empleados.png' %}" class="homeImage" alt="Seccion empleados">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="sectionAreas">
+                        <ul>
+                            <li><a href="{% url 'restaurant:regemp' %}">Registrar empleados</a></li>
+                            <li><a href="{% url 'restaurant:vistaemps' %}">Ver empleados</a></li>
+                            <li><a href="{% url 'restaurant:regCargo' %}">Agregar cargo</a></li>
+                            <li><a href="{% url 'restaurant:vercargos' %}">Ver cargos</a></li>
+                            <li><a href="{% url 'restaurant:gestionarProveedores' %}">Gestionar Proveedor</a></li>
+                            <li><a href="{% url 'restaurant:gestionarNit' %}">Gestionar NIT</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="homeSections">
+            <div class="sectionTitle">
+                <h2>Administrar Compras</h2>
+            </div>
+            <div class="row">
+                <div class="col-md-auto">
+                    <div class="sectionImage">
+                        <img src="{% static 'restaurant/productos.jpg' %}" class="homeImage" alt="Seccion productos">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="sectionAreas">
+                        <ul>
+                            <li><a href="{% url 'restaurant:gestionarProducto' %}">Gestionar Productos</a></li>
+                            <li>Gestionar notas de compras</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="homeSections">
+            <div class="sectionTitle">
+                <h2>Administrar Ventas</h2>
+            </div>
+            <div class="row">
+                <div class="col-md-auto">
+                    <div class="sectionImage">
+                        <img src="{% static 'restaurant/ventasSection.jpg' %}" class="homeImage" alt="Seccion notas">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="sectionAreas">
+                        <ul>
+                            <li>Gestionar pedido</li>
+                            <li>Gestionar menu</li>
+                            <li>Gestionar categoria</li>
+                            <li>Generar recibo</li>
+                            <li>Generar stock</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="homeSections">
+            <div class="sectionTitle">
+                <h2>Administrar Inventarios</h2>
+            </div>
+            <div class="row">
+                <div class="col-md-auto">
+                    <div class="sectionImage">
+                        <img src="{% static 'restaurant/inventarioSection.jpg' %}" class="homeImage" alt="Seccion notas">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="sectionAreas">
+                        <ul>
+                            <li>Gestionar nota de entrada</li>
+                            <li>Gestionar lote</li>
+                            <li>Gestionar almacen</li>
+                            <li>Gestionar nota de salida para produccion</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="homeSections">
+            <div class="sectionTitle">
+                <h2>Generar reportes</h2>
+            </div>
+            <div class="row">
+                <div class="col-md-auto">
+                    <div class="sectionImage">
+                        <img src="{% static 'restaurant/notas.png' %}" class="homeImage" alt="Seccion notas">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="sectionAreas">
+                        <ul>
+                            <li>Generar reporte de ventas</li>
+                            <li>Generar reporte de compras</li>
+                            <li>Generar reporte de nota de entrada</li>
+                            <li>Generar reporte de nota de salida</li>
+                            <li>Generar reporte de lotes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="logoutContainer">
+            <form action="{% url 'restaurant:home' %}" method="POST">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <button name="perfil" class="btn btn-info">Perfil</button>
+                    </div>
+                    <div class="col-md-6">
+                        <button name="logout" class="btn btn-warning">Logout</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+    </div>
+
+</body>
+
+</html>

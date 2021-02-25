@@ -1,0 +1,36 @@
+
+body{
+    background-color:#d9d9d9;
+}
+
+.homeImage{
+    max-height: 150px;
+    border-radius: 20%;
+}
+
+.homeSections{
+    margin-bottom:30px; 
+    border-radius: 10px;
+    background-color: #bfbfbf;
+    padding: 10px;
+}
+
+.homeHeader{
+    position: relative;
+    background-color: #4d4d4d;
+    padding: 20px;
+    border-radius: 15px;
+    color: white;
+    margin-bottom: 20px;
+}
+
+.homeIcon{
+    max-height: 55px;
+    
+    border-radius: 50%;
+}
+
+.iconContainer{
+    position:absolute;
+    right:30px;
+}

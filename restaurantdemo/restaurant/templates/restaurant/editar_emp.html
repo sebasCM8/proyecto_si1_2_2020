@@ -1,0 +1,58 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Empleado</title>
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    
+    <link rel="stylesheet" href="{% static 'restaurant/editEmpleado.css' %}">
+</head>
+
+<body>
+    <div class="container">
+        <div class="emp_header">
+            <div class="row">
+                <div class="col-md-12">
+                    <h4>{{emp.emp_nombre}} {{emp.emp_apellidop}} {{emp.emp_apellidom}}</h4>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <h4>CI: {{emp.emp_ci}}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="cargos_section">
+
+            <form action="{% url 'restaurant:empeditado' %}" method="POST">
+                <div class="form-group">
+                    <label for="sueldo">Sueldo.-</label>
+                    <input type="text" id="sueldo" class="form-control" name="sueldo" value="{{emp.emp_sueldo}}">
+                </div>
+
+                <h4>Cargos.-</h4>
+                {% csrf_token %}
+                {% for c in cargos %}
+                <div class="form-group">
+                    {% if c.estado %}
+                    <input type="checkbox" checked id="{{c.cargo.car_id}}" value="{{c.cargo.car_id}}"
+                        name="{{c.cargo.car_nombre}}" class="form-check-input">
+                    {% else %}
+                    <input type="checkbox" id="{{c.cargo.car_id}}" value="{{c.cargo.car_id}}"
+                        name="{{c.cargo.car_nombre}}" class="form-check-input">
+                    {% endif %}
+                    <label for="{{c.cargo.car_id}}">{{ c.cargo.car_nombre }}</label>
+                </div>
+                {% endfor %}
+                <button class="btn btn-outline-primary" name="emp_selected" value="{{emp.emp_ci}}" >Guardar cambios</button>
+            </form>
+        </div>
+        <a class="btn btn-outline-dark" href="{% url 'restaurant:vistaemps' %}">Volver a empleados</a>
+    </div>
+</body>
+
+</html>

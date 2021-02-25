@@ -1,0 +1,58 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empleados </title>
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/empleadosVista.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/homeButton.css' %}">
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="homeButtonContainer">
+            <a href="{% url 'restaurant:home' %}"><img class="homeButtonImage" src="{% static 'restaurant/restaurantIcon.jpg' %}" alt="Restaurante Los Abuelos"></a>
+        </div>
+        <h2>Empleados .-</h2>
+        <div class="row">
+            <div class="col-md-3">
+                <h6>Nombre</h6>
+            </div>
+            <div class="col-md-3">
+                <h6>Apellidos</h6>
+            </div>
+            <div class="col-md-3">
+                <h6>Numero de carnet</h6>
+            </div>
+            <div class="col-md-3">
+                <h6>Opciones</h6>
+            </div>
+        </div>
+        <form action="{% url 'restaurant:vistaemps' %}" method="POST">
+            {% csrf_token %}
+            {% for e in emps %}
+            <div class="card empleadoCard">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">{{e.emp_nombre}}</div>
+                        <div class="col-md-3">{{e.emp_apellidop}} {{e.emp_apellidom}}</div>
+                        <div class="col-md-3">{{e.emp_ci}}</div>
+                        <div class="col-md-3">
+                            <button class="btn btn-outline-info" value="{{e.emp_id}}" name="ver">ver</button>
+                            <button class="btn btn-outline-primary" name="editar" value="{{e.emp_ci}}">editar</button>
+                            <button class="btn btn-outline-danger" name="eliminar" value="{{e.emp_ci}}">eliminar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </form>
+    </div>
+</body>
+
+</html>

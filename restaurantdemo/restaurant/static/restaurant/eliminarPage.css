@@ -1,0 +1,13 @@
+body{
+    background-color: #d9d9d9;
+}
+
+.mensajeEliminar{
+    position: absolute;
+    top: 40%;
+    left:20%;
+    width:60%;
+    margin-left: auto;
+    margin-right:auto;
+    text-align: center;
+}

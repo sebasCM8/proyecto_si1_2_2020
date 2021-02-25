@@ -1,0 +1,81 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/perfil.css' %}">
+</head>
+
+<body>
+
+    <div class="container">
+        <form action="{% url 'restaurant:perfil' %}" method="POST">
+            {% csrf_token %}
+            <div class="perfilHeader">
+                <h2>Usuario: <span>{{user.usu_nombre}}</span></h2>
+            </div>
+            <div class="perfilBody">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="text" placeholder="nombre de usuario" value="{{user.usu_nombre}}" name="usu_nombre" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input placeholder="contraseña" name="usu_contra" value="{{user.usu_contra}}" type="text" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <input type="text" maxlength="30" class="form-control" name="emp_nombre" value="{{empleado.emp_nombre}}" placeholder="nombre">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <input type="text" maxlength="20" class="form-control" name="emp_ap" value="{{empleado.emp_apellidop}}" placeholder="apellido paterno">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <input type="text" maxlength="20" class="form-control" name="emp_am" value="{{empleado.emp_apellidom}}" placeholder="apellido materno">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <input type="text" maxlength="10" placeholder="celular" name="emp_celular" value="{{empleado.emp_celular}}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <input type="text" maxlength="30" placeholder="direccion" name="emp_direccion" value="{{empleado.emp_direccion}}" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <button class="btn btn-outline-primary" value="{{user.usu_id}}" name="guardar">Guardar Cambios</button>
+                        <button class="btn btn-outline-dark" value="{{user.usu_id}}" name="cancelar">Cancelar</button>                        
+                    </div>
+
+                </div>
+            </div>
+        </form>
+    </div>
+
+</body>
+
+</html>
