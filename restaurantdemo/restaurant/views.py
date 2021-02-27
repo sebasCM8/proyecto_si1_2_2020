@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponseRedirect, reverse, redirect
-from .models import EmpleadoTb, UsuarioTb, CargoTb, EmpleadoxcargoTb, ProveedorTb, AccionTb, BitacoraTb, NitTb, ProductoTb
+from .models import EmpleadoTb, UsuarioTb, CargoTb, EmpleadoxcargoTb, ProveedorTb, AccionTb, BitacoraTb, NitTb, ProductoTb, NotacompraTb, NcompraxproductoTb
 import datetime
 
 # Create your views here.
@@ -674,3 +674,125 @@ def gest_producto_view(request):
             return HttpResponseRedirect(reverse('restaurant:gestionarProducto'))
         elif 'cancelarEliminar' in request.POST:
             return HttpResponseRedirect(reverse('restaurant:gestionarProducto'))
+
+# =================================
+# == GESTIONAR NOTA DE COMPRA =====
+# ================================
+def gest_nota_compra_view(request):
+    if request.method == 'GET':
+        if 'userid' in request.session:
+            empleado = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0].emp
+            if empleado.es_admin() == False:
+                return render(request, 'restaurant/errorPage.html')
+        else:
+            return render(request, 'restaurant/errorPage.html')
+    
+    if request.method == 'GET':
+        ncompras = NotacompraTb.objects.all()
+        return render(request, 'restaurant/gestionarNC.html', {'ncompras':ncompras})
+    else:
+        if 'registrarBtn' in request.POST:
+            productos = ProductoTb.objects.all()
+            proveedores = ProveedorTb.objects.all()
+            return render(request, 'restaurant/registrarNC.html', {'productos':productos, 'proveedores':proveedores, 'seccion1':True})
+        elif 'registrarBtn2' in request.POST: 
+            productos = ProductoTb.objects.all()
+            proveedores = ProveedorTb.objects.all()
+            plista = list()
+            for p in productos:
+                if p.prod_nombre in request.POST:
+                    plista.append(p)
+            
+            if len(plista)>0 and 'pro_id' in request.POST:
+                proveedor = ProveedorTb.objects.filter(pro_id=request.POST['pro_id'])[0]
+                return render(request, 'restaurant/registrarNC.html', {'plista':plista, 'proveedor':proveedor, 'seccion2':True})
+            else:
+                msg = "Seleccione el proveedor y almenos un producto para seguir.."
+                return render(request, 'restaurant/registrarNC.html', {'productos':productos, 'proveedores':proveedores, 'seccion1':True, 'msg':msg})
+        elif 'registrarBtn3' in request.POST:
+            proveedor = ProveedorTb.objects.filter(pro_nombre=request.POST['prov'])[0]
+            fecha = datetime.date.today()
+            plista = list()
+            productos = ProductoTb.objects.all()
+            for p in productos:
+                if p.prod_nombre in request.POST:
+                    plista.append(p)
+
+            pdlista = list()
+            for p in plista:
+                pdatos = dict()
+                pdatos['prod']=p
+                cantidad_name=p.prod_nombre+"C"
+                pdatos['cantidad']=request.POST[cantidad_name]
+                if not pdatos['cantidad'].isnumeric():
+                    msg = "Rellene correctamente los campos para continuar"
+                    return render(request, 'restaurant/registrarNC.html', {'plista':plista, 'proveedor':proveedor, 'seccion2':True, 'msg':msg})
+                precio_name = p.prod_nombre+"P"
+                pdatos['precio']=request.POST[precio_name]
+                if not pdatos['precio'].isnumeric():
+                    msg = "Rellene correctamente los campos para continuar"
+                    return render(request, 'restaurant/registrarNC.html', {'plista':plista, 'proveedor':proveedor, 'seccion2':True, 'msg':msg})
+                pu=float(pdatos['precio'])*float(pdatos['cantidad'])
+                pdatos['subtotal']=pu
+                pdlista.append(pdatos)
+
+            total = 0
+            for pd in pdlista:
+                total+=pd['subtotal']
+            return render(request, 'restaurant/registrarNC.html', {'seccion3':True, 'proveedor':proveedor, 'fecha':fecha, 'plista':pdlista, 'total':total})
+        elif 'registrarNC' in request.POST:
+            proveedor = ProveedorTb.objects.filter(pro_nombre=request.POST['prov'])[0]
+            fecha = datetime.date.today()
+            usuario = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0]
+            total = float(request.POST['total'])
+            nueva_nc = NotacompraTb(notc_fecha=fecha, notc_total=total, usu=usuario, pro=proveedor)
+            nueva_nc.save()
+
+            plista = list()
+            productos = ProductoTb.objects.all()
+            for p in productos:
+                if p.prod_nombre in request.POST:
+                    cantidadname = p.prod_nombre+"C"
+                    cantidad = int(request.POST[cantidadname])
+                    precioname = p.prod_nombre+"P"
+                    precio = float(request.POST[precioname])
+                    subtotalname = p.prod_nombre+"S"
+                    subtotal = float(request.POST[subtotalname])
+                    ncxprod = NcompraxproductoTb(ncp_cantidad=cantidad, ncp_precio=precio, ncp_subt=subtotal, nc=nueva_nc, prod=p)
+                    ncxprod.save()
+            hora = datetime.datetime.now().time()
+            accion = AccionTb.objects.filter(acc_id=9)[0]
+            registrarAccion = BitacoraTb(bit_fecha=fecha, bit_hora=hora, usu=usuario, acc=accion)
+            registrarAccion.save()
+            return HttpResponseRedirect(reverse('restaurant:gestionarNC'))
+        elif 'eliminarBtn' in request.POST:
+            nc = NotacompraTb.objects.filter(notc_id=request.POST['eliminarBtn'])[0]
+            return render(request, 'restaurant/eliminarNC.html', {'nc':nc})
+        elif 'cancelarEliminar' in request.POST:
+            return HttpResponseRedirect(reverse('restaurant:gestionarNC'))
+        elif 'eliminarNC' in request.POST:
+            nc = NotacompraTb.objects.filter(notc_id=request.POST['eliminarNC'])[0]
+            nc.detalle.clear()
+            nc.delete()
+
+            usuario = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0]
+            fecha = datetime.date.today()
+            hora = datetime.datetime.now().time()
+            accion = AccionTb.objects.filter(acc_id=10)[0]
+            registrarAccion = BitacoraTb(bit_fecha=fecha, bit_hora=hora, usu=usuario, acc=accion)
+            registrarAccion.save()
+
+            return HttpResponseRedirect(reverse('restaurant:gestionarNC'))
+        elif 'verBtn' in request.POST:
+            nc = NotacompraTb.objects.filter(notc_id=request.POST['verBtn'])[0]
+            prds = nc.detalle.all()
+            pdatos = list()
+            for p in prds:
+                det = NcompraxproductoTb.objects.filter(nc=nc, prod=p)[0]
+                datos = dict()
+                datos['prd']=p
+                datos['cantidad']=det.ncp_cantidad
+                datos['precio']=det.ncp_precio
+                datos['subt']=det.ncp_subt
+                pdatos.append(datos)
+            return render(request, 'restaurant/verNC.html', {'detalle':pdatos, 'nc':nc})

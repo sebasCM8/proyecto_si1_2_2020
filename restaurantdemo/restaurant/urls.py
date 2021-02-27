@@ -20,5 +20,6 @@ urlpatterns = [
     path('gestAccion/', views.gest_accion_view, name="gestionarAccion"),
     path('gestBitacora/', views.gest_bitacora, name="gestionarBitacora"),
     path('gestNit/', views.gest_nit_view, name="gestionarNit"),
-    path('gestProducto/', views.gest_producto_view, name="gestionarProducto")    
+    path('gestProducto/', views.gest_producto_view, name="gestionarProducto"),
+    path('gestNC/', views.gest_nota_compra_view, name="gestionarNC")    
 ]

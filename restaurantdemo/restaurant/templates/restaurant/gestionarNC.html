@@ -1,0 +1,72 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Notas de Compra</title>
+
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'fontAwesome/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/homeButton.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/gestNC.css' %}">
+</head>
+
+<body>
+    <div class="container">
+        <div class="homeButtonContainer">
+            <a href="{% url 'restaurant:home' %}"><img class="homeButtonImage"
+                    src="{% static 'restaurant/restaurantIcon.jpg' %}" alt="Restaurante Los Abuelos"></a>
+        </div>
+        <form action="{% url 'restaurant:gestionarNC' %}" method="POST">
+            {% csrf_token %}
+            <div class="gncomprasHeader">
+                <h1>Gestionar Notas de Compra</h1>
+                <p>Registrar nueva nota de compra
+                    <button name="registrarBtn" class="btn btn-primary">
+                        <i class="fas fa-plus-circle"></i>
+                    </button>
+                </p>
+            </div>
+            <div class="gncomprasBody">
+                <div class="row">
+                    <div class="col-md-3">
+                        <h4>Id</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <h4>Proveedor</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <h4>Fecha</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <h4>Opciones</h4>
+                    </div>
+                </div> <br/>
+                {% for nc in ncompras %}
+                <div class="row">
+                    <div class="col-md-3">
+                        <label for="">{{nc.notc_id}}</label>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="">{{nc.pro.pro_nombre}}</label>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="">{{nc.notc_fecha}}</label>
+                    </div>
+                    <div class="col-md-3">
+                        <button name="verBtn" class="btn btn-info" value="{{nc.notc_id}}">Ver</button>
+                        <button name="eliminarBtn" class="btn btn-danger" value="{{nc.notc_id}}">Eliminar</button>
+                    </div>
+                </div>
+                <hr>
+                {% endfor %}
+            </div>
+        </form>
+    </div>
+</body>
+
+</html>

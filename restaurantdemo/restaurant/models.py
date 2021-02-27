@@ -133,6 +133,7 @@ class NotacompraTb(models.Model):
 
 
 class NcompraxproductoTb(models.Model):
+    ncp_id = models.AutoField(db_column='ncp_id', primary_key=True)  
     ncp_cantidad = models.IntegerField(blank=True, null=True)
     ncp_precio = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     ncp_subt = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)

@@ -1,0 +1,92 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ver Nota de Compra</title>
+
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/gestNC.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1>Nota de compra</h1>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Usuario:</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="">{{nc.usu.usu_nombre}}</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Proveedor:</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="">{{nc.pro.pro_nombre}}</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Fecha:</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <label>{{nc.notc_fecha}}</label>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-3">
+                        <h4>Producto</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <h4>Cantidad</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <h4>Precio</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <h4>Sub total</h4>
+                    </div>
+                </div>
+                {% for d in detalle %}
+                <div class="row">
+                    <div class="col-md-3">
+                        <label for="">{{d.prd.prod_nombre}}</label>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="">{{d.cantidad}}</label>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="">{{d.precio}}</label>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="">{{d.subt}}</label>
+                    </div>
+                </div>
+                {% endfor %}
+                <hr>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Total</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="">{{nc.notc_total}}</label>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'restaurant:gestionarNC' %}" class="btn btn-secondary">Volver a notas de compra</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

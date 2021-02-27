@@ -1,0 +1,208 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Nota de compra</title>
+
+
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/gestNC.css' %}">
+
+    
+    <script type="text/javascript" src="{% static 'bootstrap/jquery-3.5.1.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/popper.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/bootstrap.min.js' %}"></script>
+</head>
+
+<body>
+    <div class="container">
+        <form action="{% url 'restaurant:gestionarNC' %}" method="POST">
+            {% csrf_token %}
+            <div class="gncomprasHeader">
+                <h1>Nueva nota de compra.-</h1>
+            </div>
+            <!-- SECCION DE PROVEEDOR Y PRODUCTOS -->
+            {% if seccion1 %}
+            <div class="ppSection">
+            {% else %}
+            <div class="ppSection visibleSection">
+            {% endif %}
+                <h4>Seleccione el proveedor y productos que van en la nota de compra:</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <button class="btn btn-light" type="button" data-toggle="collapse" data-target="#proveedor"
+                            aria-expanded="false" aria-controls="proveedor">
+                            Proveedor
+                        </button> <br />
+                        <div class="collapse" id="proveedor">
+                            {% for p in proveedores %}
+                            <div class="form-check">
+                                <input type="radio" name="pro_id" id="{{p.pro_id}}" value="{{ p.pro_id }}"
+                                    class="form-check-input">
+                                <label for="{{p.pro_id}}" class="form-check-label">{{p.pro_nombre}}</label>
+                                <hr>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-light" type="button" data-toggle="collapse" data-target="#productos"
+                            aria-expanded="false" aria-controls="productos">
+                            Productos
+                        </button> <br />
+                        <div class="collapse" id="productos">
+                            {% for pr in productos %}
+                            <div class="form-check">
+                                <input type="checkbox" name="{{pr.prod_nombre}}" id="{{pr.prod_nombre}}" value="{{pr.prod_id}}"
+                                    class="form-check-input">
+                                <label for="{{pr.prod_nombre}}" class="form-check-label">{{pr.prod_nombre}}</label>
+                                <hr>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div> <br/>
+                <button class="btn btn-primary" name="registrarBtn2">Siguiente</button> <br/>
+                <label style="color:red;" for="">{{msg}}</label>
+            </div>
+            <!-- SECCION DE DETALLE -->
+            {% if seccion2 %}
+            <div class="pdSection">
+            {% else %}
+            <div class="pdSection visibleSection">
+            {% endif %}
+                <h4>Indique las cantidades de cada producto a comprar:</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Proveedor: </h6>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input class="form-control" type="text" name="prov" value="{{proveedor.pro_nombre}}" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <h4>Producto</h4>
+                    </div>
+                    <div class="col-md-4">
+                        <h4>Cantidad</h4>
+                    </div>
+                    <div class="col-md-4">
+                        <h4>Precio unitario</h4>
+                    </div>
+                </div>
+                {% for p in plista %}
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <input class="form-control" type="text" name="{{p.prod_nombre}}" value="{{p.prod_nombre}}" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <input class="form-control" type="text" name="{{p.prod_nombre}}C">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="{{p.prod_nombre}}P">
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                <button class="btn btn-primary" name="registrarBtn3">Siguiente</button> <br/>
+                <label style="color:red;" for="">{{msg}}</label>
+            </div>
+
+            <!-- SECCION FINAL -->
+            {% if seccion3 %}
+            <div class="fSection">
+            {% else %}
+            <div class="fSection visibleSection">
+            {% endif %}
+                <h2>Nota de compra.-</h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Proveedor:</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="prov" value="{{proveedor.pro_nombre}}" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Fecha:</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="">{{fecha}}</label>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-3">
+                        <h4>Producto</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <h4>Cantidad</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <h4>Precio</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <h4>Subtotal</h4>
+                    </div>
+                </div>
+                {% for pd in plista %}
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="{{pd.prod.prod_nombre}}" value="{{pd.prod.prod_nombre}}" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="{{pd.prod.prod_nombre}}C" value="{{pd.cantidad}}" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="{{pd.prod.prod_nombre}}P" value="{{pd.precio}}" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="{{pd.prod.prod_nombre}}S" value="{{pd.subtotal}}" readonly>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                <hr>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Total:</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="total" value="{{total}}" readonly>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-success" name="registrarNC">Registrar nota de compra</button> <br/>
+            </div>
+
+        </form>
+        <br/>
+        <a class="btn btn-light" href="{% url 'restaurant:gestionarNC' %}">Volver a notas de compra</a>
+        <br/><br/>
+    </div>
+</body>
+
+</html>
