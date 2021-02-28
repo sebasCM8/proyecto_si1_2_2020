@@ -21,5 +21,7 @@ urlpatterns = [
     path('gestBitacora/', views.gest_bitacora, name="gestionarBitacora"),
     path('gestNit/', views.gest_nit_view, name="gestionarNit"),
     path('gestProducto/', views.gest_producto_view, name="gestionarProducto"),
-    path('gestNC/', views.gest_nota_compra_view, name="gestionarNC")    
+    path('gestNC/', views.gest_nota_compra_view, name="gestionarNC"),
+    path('gestNE/', views.gest_nota_entrada_view, name="gestionarNE"),
+    path('gestAlmacen/', views.gest_almacen, name="gestionarAlmacen")    
 ]

@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Almacen</title>
+
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/gestionarAlmacen.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h2>Nuevo almacen</h2>
+            </div>
+            <div class="card-body">
+                <form action="{% url 'restaurant:gestionarAlmacen' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <input type="text" name="alm_nombre" maxlength="20" placeholder="nombre del almacen" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <input name="alm_ubicacion" maxlength="50" placeholder="ubicacion del almacen" type="text" class="form-control">
+                    </div>
+                    <button name="registrarAlmacen" class="btn btn-primary">Registrar almacen</button>
+                </form>
+            </div>
+            <div class="card-footer">
+                {% if ok %}
+                <label style="color: green;" for="">{{msg}}</label>
+                {% else %}
+                <label style="color: red;" for="">{{msg}}</label>
+                {% endif %}
+            </div>
+        </div>
+        <br/>
+        <a class="btn btn-light" href="{% url 'restaurant:gestionarAlmacen' %}">Volver a almacenes</a>
+        <br/><br/>
+    </div>
+</body>
+</html>

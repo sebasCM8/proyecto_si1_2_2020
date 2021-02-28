@@ -1,0 +1,44 @@
+body{
+    background-color: #595959;
+}
+
+
+.gneHeader{
+    margin-top: 30px;
+    background-color: #808080;
+    padding: 20px;
+    color: #e6e6e6;
+    margin-bottom: 50px;
+    border-radius: 2%;
+}
+
+.registrarHeader{
+    margin-top: 30px;
+    padding: 20px;
+    color: #e6e6e6;
+    margin-bottom: 50px;
+    border-radius: 2%;
+}
+
+
+.gneBody{
+    margin-top: 50px;
+    background-color: #d9d9d9;
+    padding: 20px;
+}
+
+.prdsSection{
+    margin-top: 50px;
+    background-color: #d9d9d9;
+    padding: 20px;
+}
+
+.cantidadSection{
+    margin-top: 50px;
+    background-color: #d9d9d9;
+    padding: 20px;
+}
+
+.visibleSection{
+    visibility: hidden;
+}

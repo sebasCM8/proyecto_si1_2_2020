@@ -1,0 +1,63 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ver nota de entrada</title>
+
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/gestionarNE.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h2>Nota de entrada</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Usuario</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="">{{note.usu.usu_nombre}}</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Fecha</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="">{{note.note_fecha}}</label>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Producto</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <h4>Cantidad</h4>
+                    </div>
+                </div>
+                {% for d in detalle%}
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="">{{d.p.prod_nombre}}</label>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="">{{d.cantidad}}</label>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="card-footer"></div>
+        </div>
+        <br/>
+        <a href="{% url 'restaurant:gestionarNE' %}" class="btn btn-light">Volver a notas de entrada</a>
+    </div>
+</body>
+</html>

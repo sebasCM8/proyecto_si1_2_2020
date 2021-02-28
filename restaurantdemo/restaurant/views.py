@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponseRedirect, reverse, redirect
-from .models import EmpleadoTb, UsuarioTb, CargoTb, EmpleadoxcargoTb, ProveedorTb, AccionTb, BitacoraTb, NitTb, ProductoTb, NotacompraTb, NcompraxproductoTb
+from .models import EmpleadoTb, UsuarioTb, CargoTb, EmpleadoxcargoTb, ProveedorTb, AccionTb, BitacoraTb, NitTb, ProductoTb, NotacompraTb, NcompraxproductoTb, NotaentradaTb, NentradaxproductoTb, AlmacenTb
 import datetime
 
 # Create your views here.
@@ -796,3 +796,138 @@ def gest_nota_compra_view(request):
                 datos['subt']=det.ncp_subt
                 pdatos.append(datos)
             return render(request, 'restaurant/verNC.html', {'detalle':pdatos, 'nc':nc})
+# =================================
+# == GESTIONAR NOTA DE ENTRADA =====
+# ================================
+def gest_nota_entrada_view(request):
+    if request.method == 'GET':
+        if 'userid' in request.session:
+            empleado = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0].emp
+            if empleado.es_admin() == False:
+                return render(request, 'restaurant/errorPage.html')
+        else:
+            return render(request, 'restaurant/errorPage.html')
+    
+    if request.method == 'GET':
+        notas = NotaentradaTb.objects.all()
+        return render(request, 'restaurant/gestionarNE.html', {'notase':notas})
+    else:
+        if 'registrarBtn' in request.POST:
+            productos = ProductoTb.objects.all()
+            return render(request, 'restaurant/registrarNE.html', {'productos':productos, 'seccion1':True})
+        elif 'registrarBtn2' in request.POST:
+            productos = ProductoTb.objects.all()
+            plista = list()
+            for p in productos:
+                if p.prod_nombre in request.POST:
+                    plista.append(p)
+            if len(plista) == 0:
+                return render(request, 'restaurant/registrarNE.html', {'seccion1':True, 'productos':productos, 'msg':"Debe seleccionar almenos un producto"})
+            return render(request, 'restaurant/registrarNE.html', {'seccion2':True, 'plista':plista})
+        elif 'registrarNE' in request.POST:
+            productos = ProductoTb.objects.all()
+            plista = list()
+            for p in productos:
+                if p.prod_nombre in request.POST:
+                    plista.append(p)
+            pdatos = list()
+            for prd in plista:
+                datos = dict()
+                datos['prod'] = prd
+                cantidadname = prd.prod_nombre+"C"
+                cantidad = request.POST[cantidadname]
+                if not cantidad.isnumeric():
+                    return render(request, 'restaurant/registrarNE.html', {'seccion2':True, 'msg':"Introduzca las cantidades correcatmente", 'plista':plista})
+                datos['cantidad']=int(cantidad)
+                pdatos.append(datos)
+            fecha = datetime.date.today()
+            usuario = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0]
+            nueva_ne = NotaentradaTb(note_fecha=fecha, usu=usuario)
+            nueva_ne.save()
+
+            hora = datetime.datetime.now().time()
+            accion = AccionTb.objects.filter(acc_id=11)[0]
+            registrarAccion = BitacoraTb(bit_fecha=fecha, bit_hora=hora, usu=usuario, acc=accion)
+            registrarAccion.save()
+
+            for det in pdatos:
+                prod = det['prod']
+                cantidad = det['cantidad']
+                nu_det = NentradaxproductoTb(nep_cantidad=cantidad, prod=prod, ne=nueva_ne)
+                nu_det.save()
+            return HttpResponseRedirect(reverse('restaurant:gestionarNE'))
+        elif 'verBtn' in request.POST:
+            note = NotaentradaTb.objects.filter(note_id=request.POST['verBtn'])[0]
+            prds = note.detalle.all()
+            detalle_list = list()
+            for p in prds:
+                det = NentradaxproductoTb.objects.filter(prod=p, ne=note)[0]
+                datos = dict()
+                datos['p'] = p
+                datos['cantidad'] = det.nep_cantidad
+                detalle_list.append(datos)
+            return render(request, 'restaurant/verNE.html', {'note':note, 'detalle':detalle_list})
+        elif 'eliminarBtn' in request.POST:
+            note = NotaentradaTb.objects.filter(note_id=request.POST['eliminarBtn'])[0]
+            return render(request, 'restaurant/eliminarNE.html', {'ne':note})
+        elif 'eliminarNE' in request.POST:
+            note = NotaentradaTb.objects.filter(note_id=request.POST['eliminarNE'])[0]
+            note.detalle.clear()
+            note.delete()
+
+            usuario = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0]
+            fecha = datetime.date.today()
+            hora = datetime.datetime.now().time()
+            accion = AccionTb.objects.filter(acc_id=12)[0]
+            registrarAccion = BitacoraTb(bit_fecha=fecha, bit_hora=hora, usu=usuario, acc=accion)
+            registrarAccion.save()
+            return HttpResponseRedirect(reverse('restaurant:gestionarNE'))
+        elif 'cancelarEliminar' in request.POST:
+            return HttpResponseRedirect(reverse('restaurant:gestionarNE'))
+# =================================
+# == GESTIONAR ALMACEN =====
+# ================================
+def gest_almacen(request):
+    if request.method == 'GET':
+        if 'userid' in request.session:
+            emp = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0].emp
+            if not emp.es_admin():
+                return render(request, 'restaurant/errorPage.html')
+        else:
+            return render(request, 'restaurant/errorPage.html')
+        
+    if request.method == 'GET':
+        almacenes = AlmacenTb.objects.all()
+        return render(request, 'restaurant/gestionarAlmacen.html', {'almacenes':almacenes})
+    else:
+        if 'registrarBtn' in request.POST:
+            return render(request, 'restaurant/registrarAlmacen.html')
+        elif 'registrarAlmacen' in request.POST:
+            alm_nombre = request.POST['alm_nombre']
+            alm_ubicacion = request.POST['alm_ubicacion']
+            if alm_nombre != "" and alm_ubicacion != "":
+                almacenes = AlmacenTb.objects.filter(alm_nombre=alm_nombre)
+                if len(almacenes)>0:
+                    return render(request, 'restaurant/registrarAlmacen.html',{'msg':"Almacen ya registrado"})
+                nu_almacen = AlmacenTb(alm_nombre=alm_nombre, alm_ubicacion=alm_ubicacion)
+                nu_almacen.save()
+
+                usuario = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0]
+                fecha = datetime.date.today()
+                hora = datetime.datetime.now().time()
+                accion = AccionTb.objects.filter(acc_id=13)[0]
+                registrarAccion = BitacoraTb(bit_fecha=fecha, bit_hora=hora, usu=usuario, acc=accion)
+                registrarAccion.save()
+
+                return render(request, 'restaurant/registrarAlmacen.html',{'msg':"Almacen registrado", 'ok':True})
+            else:
+                return render(request, 'restaurant/registrarAlmacen.html',{'msg':"Rellene todos los campos correctamente"})
+        elif 'eliminarBtn' in request.POST:
+            almacen = AlmacenTb.objects.filter(alm_id=request.POST['eliminarBtn'])[0]
+            return render(request, 'restaurant/eliminarAlmacen.html', {'alm':almacen})
+        elif 'cancelarEliminar' in request.POST:
+            return HttpResponseRedirect(reverse('restaurant:gestionarAlmacen'))
+        elif 'eliminarAlm' in request.POST:
+            almacen = AlmacenTb.objects.filter(alm_id=request.POST['eliminarAlm'])[0]
+            almacen.delete()
+            return HttpResponseRedirect(reverse('restaurant:gestionarAlmacen'))

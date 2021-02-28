@@ -157,6 +157,7 @@ class NotaentradaTb(models.Model):
         db_table = 'notaentrada_tb'
 
 class NentradaxproductoTb(models.Model):
+    nep_id = models.AutoField(db_column='nep_id', primary_key=True)
     nep_cantidad = models.IntegerField(blank=True, null=True)
     prod = models.ForeignKey(ProductoTb, on_delete= models.CASCADE)
     ne = models.ForeignKey(NotaentradaTb, on_delete= models.CASCADE)
@@ -181,7 +182,7 @@ class LoteTb(models.Model):
     lot_fecha = models.DateField(blank=True, null=True)
     prod = models.ForeignKey(ProductoTb, on_delete= models.CASCADE)
     alm = models.ForeignKey(AlmacenTb, on_delete= models.CASCADE)
-    nep = models.ForeignKey(NotaentradaTb, on_delete= models.CASCADE)
+    nep = models.ForeignKey(NentradaxproductoTb, on_delete= models.CASCADE)
 
     class Meta:
         managed = False
