@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Lote</title>
+
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/gestionarLotes.css' %}">
+
+    <script type="text/javascript" src="{% static 'bootstrap/jquery-3.5.1.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/popper.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/bootstrap.min.js' %}"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h2>Nuevo Lote</h2>
+            </div>
+            <div class="card-body">
+                <form action="{% url 'restaurant:gestionarLote' %}" method="POST">
+                    {% csrf_token %}
+                    <button class="btn btn-light" type="button" data-toggle="collapse" data-target="#almacen"
+                        aria-expanded="false" aria-controls="almacen">
+                        Almacen
+                    </button> <br /><br />
+                    <div class="collapse" id="almacen">
+                        {% for a in almacenes %}
+                        <div class="form-check">
+                            <input type="radio" name="alm_nombre" id="{{a.alm_nombre}}" value="{{ a.alm_id }}"
+                                class="form-check-input">
+                            <label for="{{a.alm_nombre}}" class="form-check-label">{{a.alm_nombre}}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <hr>
+                    <button class="btn btn-light" type="button" data-toggle="collapse" data-target="#entrada"
+                        aria-expanded="false" aria-controls="entrada">
+                        Entrada
+                    </button> <br /><br />
+                    <div class="collapse" id="entrada">
+                        {% for e in entradas %}
+                        <div class="form-check">
+                            <div class="row">
+                                <div class="col-md-auto">
+                                    <input type="radio" name="nep_id" id="{{e.entrada.nep_id}}"
+                                        value="{{e.entrada.nep_id}}" class="form-check-input">
+                                    <label for="{{e.entrada.nep_id}}"
+                                        class="form-check-label">{{e.entrada.prod.prod_nombre}}</label>
+                                </div>
+                                <div class="col-md-auto">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" name="{{e.entrada.nep_id}}S" value="{{e.saldo}}" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <hr>
+                    <div class="form-group">
+                        <input type="text" name="lote_canti" placeholder="cantidad del producto en el lote"
+                            class="form-control">
+                    </div>
+                    <button name="registrarLote" class="btn btn-primary">Registrar Lote</button>
+                </form>
+            </div>
+            <div class="card-footer">
+                {% if ok %}
+                <label style="color: green;" for="">{{msg}}</label>
+                {% else %}
+                <label style="color: red;" for="">{{msg}}</label>
+                {% endif %}
+            </div>
+        </div>
+        <br/><br/>
+        <a href="{% url 'restaurant:gestionarLote' %}" class="btn btn-light">Volver a lotes</a>
+        <br/><br/>
+    </div>
+</body>
+
+</html>

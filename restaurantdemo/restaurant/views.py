@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponseRedirect, reverse, redirect
-from .models import EmpleadoTb, UsuarioTb, CargoTb, EmpleadoxcargoTb, ProveedorTb, AccionTb, BitacoraTb, NitTb, ProductoTb, NotacompraTb, NcompraxproductoTb, NotaentradaTb, NentradaxproductoTb, AlmacenTb
+from .models import EmpleadoTb, UsuarioTb, CargoTb, EmpleadoxcargoTb, ProveedorTb, AccionTb, BitacoraTb, NitTb, ProductoTb, NotacompraTb, NcompraxproductoTb, NotaentradaTb, NentradaxproductoTb, AlmacenTb, LoteTb, MovimientoloteTb
 import datetime
 
 # Create your views here.
@@ -472,6 +472,10 @@ def gestionar_proveedor_vista(request):
             return render(request, 'restaurant/eliminarProveedor.html', {'prv':p})
         elif 'eliminarProv' in request.POST:
             p = ProveedorTb.objects.filter(pro_id=request.POST['eliminarProv'])[0]
+            notas = NotacompraTb.objects.filter(pro=p)
+            if len(notas)>0:
+                msg = "Este proveedor tiene notas de compra, primero elimina esas notas de compra"
+                return render(request, 'restaurant/eliminarProveedor.html', {'prv':p, 'msg':msg})
             p.delete()
             return HttpResponseRedirect(reverse('restaurant:gestionarProveedores'))
         elif 'cancelarEliminar' in request.POST:
@@ -670,6 +674,15 @@ def gest_producto_view(request):
             return render(request, 'restaurant/eliminarProducto.html', {'producto':producto})
         elif 'eliminarProducto' in request.POST:
             producto = ProductoTb.objects.filter(prod_id=request.POST['eliminarProducto'])[0]
+            notasc = NcompraxproductoTb.objects.filter(prod=producto)
+            if len(notasc)>0:
+                msg = "Este producto tiene notas de compra, primero elimine esas notas si desea eliminar el producto"
+                return render(request, 'restaurant/eliminarProducto.html', {'producto':producto, 'msg':msg})
+            notase = NentradaxproductoTb.objects.filter(prod=producto)
+            if len(notase)>0:
+                msg = "Este producto tiene notas de entrada, primero elimine esas notas si desea eliminar el producto"
+                return render(request, 'restaurant/eliminarProducto.html', {'producto':producto, 'msg':msg})
+
             producto.delete()
             return HttpResponseRedirect(reverse('restaurant:gestionarProducto'))
         elif 'cancelarEliminar' in request.POST:
@@ -931,3 +944,92 @@ def gest_almacen(request):
             almacen = AlmacenTb.objects.filter(alm_id=request.POST['eliminarAlm'])[0]
             almacen.delete()
             return HttpResponseRedirect(reverse('restaurant:gestionarAlmacen'))
+# =================================
+# == GESTIONAR LOTES =====
+# ================================
+def obtener_entradas():
+    entradas = NentradaxproductoTb.objects.all()
+    elista = list()
+    for e in entradas:
+        lotes = LoteTb.objects.filter(nep=e)
+        usados = 0
+        for l in lotes:
+            usados += l.lot_canti
+        saldo = e.nep_cantidad - usados
+        if saldo > 0:
+            datos = dict()
+            datos['entrada'] = e
+            datos['saldo'] = saldo
+            elista.append(datos)
+    return elista
+
+def registrarAccion(accion_id, usuario):
+    fecha = datetime.date.today()
+    hora = datetime.datetime.now().time()
+    accion = AccionTb.objects.filter(acc_id=accion_id)[0]
+    registrarAccion = BitacoraTb(bit_fecha=fecha, bit_hora=hora, usu=usuario, acc=accion)
+    registrarAccion.save()
+
+def gest_lote_view(request):
+    if request.method == 'GET':
+        if 'userid' in request.session:
+            emp = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0].emp
+            if not emp.es_admin():
+                return render(request, 'restaurant/errorPage.html')
+        else:
+            return render(request, 'restaurant/errorPage.html')
+    
+    if request.method == 'GET':
+        lotes = LoteTb.objects.filter(lot_estado=1)
+        return render(request, 'restaurant/gestionarLotes.html', {'lotes':lotes})
+    else:
+        if 'registrarBtn' in request.POST:
+            elista = obtener_entradas()
+            almacenes = AlmacenTb.objects.all()
+            return render(request, 'restaurant/registrarLote.html', {'entradas':elista, 'almacenes':almacenes})
+        elif 'registrarLote' in request.POST:
+            lote_canti = request.POST['lote_canti']
+            if 'alm_nombre' in request.POST and 'nep_id' in request.POST and lote_canti.isnumeric():
+                almacen = AlmacenTb.objects.filter(alm_id=request.POST['alm_nombre'])[0]
+                nep = NentradaxproductoTb.objects.filter(nep_id=request.POST['nep_id'])[0]
+                lotecanti = int(lote_canti)
+                sname = str(nep.nep_id)+"S"
+                saldo = int(request.POST[sname])
+                if lotecanti <= saldo:
+                    fecha = datetime.date.today()
+                    nu_lote = LoteTb(lot_canti=lote_canti, lot_fecha=fecha, lot_estado=1, prod=nep.prod, alm=almacen, nep=nep)
+                    nu_lote.save()
+                    primer_mov = MovimientoloteTb(lot=nu_lote, cant=lote_canti)
+                    primer_mov.save()
+
+                    usuario = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0]
+                    registrarAccion(14, usuario)
+
+                    return HttpResponseRedirect(reverse('restaurant:gestionarLote'))
+                else:
+                    elista = obtener_entradas()
+                    almacenes = AlmacenTb.objects.all()
+                    msg = "La cantidad no debe ser mayor al saldo en la entrada"
+                    return render(request, 'restaurant/registrarLote.html', {'entradas':elista, 'almacenes':almacenes, 'msg':msg}) 
+            else:
+                elista = obtener_entradas()
+                almacenes = AlmacenTb.objects.all()
+                msg = "Rellene correctamente la cantidad, ademas seleccione un almacen y entrada"
+                return render(request, 'restaurant/registrarLote.html', {'entradas':elista, 'almacenes':almacenes, 'msg':msg})
+        elif 'verBtn' in request.POST:
+            lote = LoteTb.objects.filter(lot_id=request.POST['verBtn'])[0]
+            movs = MovimientoloteTb.objects.filter(lot=lote)
+            cant = 0
+            for m in movs:
+                cant += m.cant
+            return render(request, 'restaurant/verLote.html', {'lote':lote, 'cantidad':cant})
+        elif 'eliminarBtn' in request.POST:
+            lote = LoteTb.objects.filter(lot_id=request.POST['eliminarBtn'])[0]
+            return render(request, 'restaurant/eliminarLote.html', {'lote':lote})
+        elif 'eliminarLote' in request.POST:
+            lote = LoteTb.objects.filter(lot_id=request.POST['eliminarLote'])[0]
+            lote.lot_estado = 0
+            lote.save()
+            return HttpResponseRedirect(reverse('restaurant:gestionarLote'))
+        elif 'cancelarEliminar' in request.POST:
+            return HttpResponseRedirect(reverse('restaurant:gestionarLote'))

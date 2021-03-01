@@ -34,6 +34,9 @@ insert into accion_tb (acc_nombre) values
 insert into accion_tb (acc_nombre) values 
 ('registrar almacen');
 
+insert into accion_tb (acc_nombre) values 
+('registrar lote');
+
 select * from accion_tb;
 
 select * from bitacora_tb;
@@ -46,6 +49,10 @@ select * from notaentrada_tb;
 select * from nentradaxproducto_tb;
 
 alter table ncompraxproducto_tb add ncp_id int not null auto_increment primary key first;
+
+select * from lote_tb;
+
+alter table lote_tb add column lot_estado int default 1;
 
 -- ==============================
 -- MODIFYING COMPRAXPRODUCTOS TABLE
@@ -102,6 +109,11 @@ CREATE TABLE movimientoLote_tb (
     FOREIGN KEY (lot_id) REFERENCES lote_tb (lot_id)
 );
 
+-- ==============================
+-- MODIFYING MOVIMIENTO LOE TABLE
+-- ==============================
+select * from movimientolote_tb;
+alter table movimientolote_tb add movl_id int not null auto_increment primary key first;
 
 
 

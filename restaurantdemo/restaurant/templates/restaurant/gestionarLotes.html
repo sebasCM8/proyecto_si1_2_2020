@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Lotes</title>
+
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'fontAwesome/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/gestionarLotes.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/homeButton.css' %}">
+</head>
+
+<body>
+    <div class="container">
+        <div class="homeButtonContainer">
+            <a href="{% url 'restaurant:home' %}"><img class="homeButtonImage"
+                    src="{% static 'restaurant/restaurantIcon.jpg' %}" alt="Restaurante Los Abuelos"></a>
+        </div>
+        <form action="{% url 'restaurant:gestionarLote' %}" method="POST">
+            {% csrf_token %}
+            <div class="glHeader">
+                <h1>Gestionar Lotes.-</h1>
+                <p>Registrar nuevo lote
+                    <button name="registrarBtn" class="btn btn-primary">
+                        <i class="fas fa-plus-circle"></i>
+                    </button>
+                </p>
+            </div>
+            <div class="glBody">
+                <h4>Lotes en almacen</h4>
+                <br/>
+                <div class="row">
+                    <div class="col-md-3">
+                        <h4>Id</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <h4>Almacen</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <h4>Fecha</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <h4>Opciones</h4>
+                    </div>
+                </div>
+                {% for l in lotes %}
+                <div class="row">
+                    <div class="col-md-3">
+                        <label for="">{{l.lot_id}}</label>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="">{{l.alm.alm_nombre}}</label>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="">{{l.lot_fecha}}</label>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-info" value="{{l.lot_id}}" name="verBtn">Ver</button>
+                        <button class="btn btn-danger" value="{{l.lot_id}}" name="eliminarBtn">Eliminar</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </form>
+    </div>
+</body>
+
+</html>

@@ -1,27 +1,28 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eliminar Producto</title>
+    <title>Eliminar lote</title>
 
     <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'restaurant/eliminarPage.css' %}">
 </head>
 <body>
     <div class="container">
-        <form action="{% url 'restaurant:gestionarProducto' %}" method="POST">
+        <form action="{% url 'restaurant:gestionarLote' %}" method="POST">
             {% csrf_token %}
             <div class="mensajeEliminar">
-                <h2>Seguro que desea eliminar el producto: {{producto.prod_nombre}} ?</h2>
+                <h2>Seguro que desea eliminar el lote: {{lote.lot_id}} ?</h2>
                 <div class="row justify-content-center">
-                    <div class="col-md-auto"><button name="eliminarProducto" value="{{producto.prod_id}}" class="btn btn-outline-danger">Eliminar</button></div>
-                    <div class="col-md-auto"><button name="cancelarEliminar" class="btn btn-outline-dark">Cancelar</button></div>
+                    <div class="col-md-auto"><button name="eliminarLote" value="{{lote.lot_id}}"
+                            class="btn btn-outline-danger">Eliminar</button></div>
+                    <div class="col-md-auto"><button name="cancelarEliminar"
+                            class="btn btn-outline-dark">Cancelar</button></div>
                 </div>
-                <label for="" style="color:red">{{msg}}</label>
+            </div>
         </form>
     </div>
 </body>

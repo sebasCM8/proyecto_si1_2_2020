@@ -180,6 +180,7 @@ class LoteTb(models.Model):
     lot_id = models.AutoField(primary_key=True)
     lot_canti = models.IntegerField(db_column='lot_cantI', blank=True, null=True)  # Field name made lowercase.
     lot_fecha = models.DateField(blank=True, null=True)
+    lot_estado = models.IntegerField(db_column='lot_estado', blank=True, null=True)  
     prod = models.ForeignKey(ProductoTb, on_delete= models.CASCADE)
     alm = models.ForeignKey(AlmacenTb, on_delete= models.CASCADE)
     nep = models.ForeignKey(NentradaxproductoTb, on_delete= models.CASCADE)
@@ -189,6 +190,7 @@ class LoteTb(models.Model):
         db_table = 'lote_tb'
 
 class MovimientoloteTb(models.Model):
+    movl_id = models.AutoField(primary_key=True)
     lot = models.ForeignKey(LoteTb, on_delete= models.CASCADE)
     cant = models.IntegerField(blank=True, null=True)
 

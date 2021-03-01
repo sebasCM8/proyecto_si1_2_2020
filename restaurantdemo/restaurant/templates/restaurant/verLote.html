@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ver lote</title>
+
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/gestionarLotes.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1>Lote</h1>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Almacen</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="">{{lote.alm.alm_nombre}}</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Fecha</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="">{{lote.lot_fecha}}</label>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Producto</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <h4>Cantidad</h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="">{{lote.prod.prod_nombre}}</label>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="">{{cantidad}}</label>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'restaurant:gestionarLote' %}" class="btn btn-secondary">Volver a lotes</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

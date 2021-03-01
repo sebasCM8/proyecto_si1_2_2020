@@ -1,5 +1,5 @@
 Pendientes a implementar:
-1 eliminar notas de compra si se elimina a un proveedor
-2 eliminar notas de compra y entrada si se elimina a un producto
-3 solucionar traer compraxproductos 
-4 Eliminar lotes si se eliminar un almacen
+1 eliminar notas de compra si se elimina a un proveedor /// hecho
+2 eliminar notas de compra y entrada si se elimina a un producto // hecho
+3 solucionar traer compraxproductos //hecho
+4 Eliminar lotes si se eliminar un almacen 
