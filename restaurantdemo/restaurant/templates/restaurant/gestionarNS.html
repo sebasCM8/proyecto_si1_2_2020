@@ -1,0 +1,69 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Notas de salida para produccion</title>
+
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/homeButton.css' %}">
+    <link rel="stylesheet" href="{% static 'fontAwesome/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/gestionarNS.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="homeButtonContainer">
+            <a href="{% url 'restaurant:home' %}"><img class="homeButtonImage"
+                    src="{% static 'restaurant/restaurantIcon.jpg' %}" alt="Restaurante Los Abuelos"></a>
+        </div>
+        <form action="{% url 'restaurant:gestionarNS' %}" method="POST">
+            {% csrf_token %}
+            <div class="gnsHeader">
+                <h1>Gestionar Notas de Salida.-</h1>
+                <p>Registrar nueva nota de salida
+                    <button name="registrarBtn" class="btn btn-primary">
+                        <i class="fas fa-plus-circle"></i>
+                    </button>
+                </p>
+            </div>
+            <div class="gnsBody">
+                <h4>Cuerpo ns s</h4> <br/>
+                <div class="row">
+                    <div class="col-md-3">
+                        <h4>Usuario</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <h4>Almacen</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <h4>Fecha</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <h4>Opciones</h4>
+                    </div>
+                </div>
+                {% for ns in notass %}
+                <div class="row">
+                    <div class="col-md-3">
+                        <label for="">{{ns.usu.usu_nombre}}</label>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="">{{ns.alm.alm_nombre}}</label>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="">{{ns.nots_fecha}}</label>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-info" name="verBtn" value="{{ns.nots_id}}">Ver</button>
+                        <button class="btn btn-danger" name="eliminarBtn" value="{{ns.nots_id}}">Eliminar</button>
+                    </div>
+                </div>
+                <hr>
+                {% endfor %}
+            </div>
+        </form>
+    </div>
+</body>
+</html>

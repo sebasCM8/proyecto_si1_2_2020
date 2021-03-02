@@ -220,6 +220,7 @@ class BitacoraTb(models.Model):
 class NotasalidaTb(models.Model):
     nots_id = models.AutoField(db_column='notS_id', primary_key=True)  # Field name made lowercase.
     nots_fecha = models.DateField(db_column='notS_fecha', blank=True, null=True)  # Field name made lowercase.
+    nots_estado = models.IntegerField(db_column='nots_estado', blank=True, null=True)
     usu = models.ForeignKey(UsuarioTb, on_delete= models.CASCADE)
     alm = models.ForeignKey(AlmacenTb, on_delete= models.CASCADE)
 
@@ -231,6 +232,7 @@ class NotasalidaTb(models.Model):
 
 
 class NsalidaxproductoTb(models.Model):
+    nsp_id = models.AutoField(db_column='nsp_id', primary_key=True)
     nsp_cantidad = models.IntegerField(blank=True, null=True)
     prod = models.ForeignKey(ProductoTb, on_delete= models.CASCADE)
     nots = models.ForeignKey(NotasalidaTb, on_delete= models.CASCADE)  # Field name made lowercase.

@@ -37,6 +37,9 @@ insert into accion_tb (acc_nombre) values
 insert into accion_tb (acc_nombre) values 
 ('registrar lote');
 
+insert into accion_tb (acc_nombre) values 
+('registrar notaSalida');
+
 select * from accion_tb;
 
 select * from bitacora_tb;
@@ -51,8 +54,13 @@ select * from nentradaxproducto_tb;
 alter table ncompraxproducto_tb add ncp_id int not null auto_increment primary key first;
 
 select * from lote_tb;
+select * from movimientolote_tb;
+
 
 alter table lote_tb add column lot_estado int default 1;
+
+select * from notasalida_tb;
+
 
 -- ==============================
 -- MODIFYING COMPRAXPRODUCTOS TABLE
@@ -114,6 +122,29 @@ CREATE TABLE movimientoLote_tb (
 -- ==============================
 select * from movimientolote_tb;
 alter table movimientolote_tb add movl_id int not null auto_increment primary key first;
+
+-- ==============================
+-- MODIFYING SALIDA X PRODUCTO
+-- ==============================
+show create table nsalidaxproducto_tb;
+alter table nsalidaxproducto_tb drop foreign key nsalidaxproducto_tb_ibfk_1;
+alter table nsalidaxproducto_tb drop foreign key nsalidaxproducto_tb_ibfk_2;
+alter table nsalidaxproducto_tb drop primary key;
+alter table nsalidaxproducto_tb add nsp_id int not null auto_increment primary key first;
+
+ALTER TABLE nsalidaxproducto_tb ADD CONSTRAINT fk_prod_id FOREIGN KEY (prod_id) REFERENCES producto_tb(prod_id);
+ALTER TABLE nsalidaxproducto_tb ADD CONSTRAINT fk_ns_id FOREIGN KEY (notS_id) REFERENCES notasalida_tb(notS_id);
+
+select * from nsalidaxproducto_tb;
+
+
+-- ==============================
+-- MODIFYING NTOA SALIDA 
+-- ==============================
+select * from notasalida_tb;
+alter table notasalida_tb add column nots_estado int default 1;
+
+
 
 
 

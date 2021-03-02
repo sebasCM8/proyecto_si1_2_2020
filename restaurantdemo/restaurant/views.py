@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponseRedirect, reverse, redirect
-from .models import EmpleadoTb, UsuarioTb, CargoTb, EmpleadoxcargoTb, ProveedorTb, AccionTb, BitacoraTb, NitTb, ProductoTb, NotacompraTb, NcompraxproductoTb, NotaentradaTb, NentradaxproductoTb, AlmacenTb, LoteTb, MovimientoloteTb
+from .models import EmpleadoTb, UsuarioTb, CargoTb, EmpleadoxcargoTb, ProveedorTb, AccionTb, BitacoraTb, NitTb, ProductoTb, NotacompraTb, NcompraxproductoTb, NotaentradaTb, NentradaxproductoTb, AlmacenTb, LoteTb, MovimientoloteTb, NotasalidaTb, NsalidaxproductoTb
 import datetime
 
 # Create your views here.
@@ -1033,3 +1033,145 @@ def gest_lote_view(request):
             return HttpResponseRedirect(reverse('restaurant:gestionarLote'))
         elif 'cancelarEliminar' in request.POST:
             return HttpResponseRedirect(reverse('restaurant:gestionarLote'))
+# =================================
+# == GESTIONAR NOTAS DE SALIDA =====
+# ================================
+def obtener_lote_cant(lote):
+    movs = MovimientoloteTb.objects.filter(lot=lote)
+    cant = 0
+    for m in movs:
+        cant += m.cant
+    return cant
+
+def obtener_almacenes_detalle():
+    almacenes = AlmacenTb.objects.all()
+    result = list()
+    for a in almacenes:
+        datos = dict()
+        datos['alm'] = a
+        lotes = LoteTb.objects.filter(lot_estado=1, alm=a)
+        prds = dict()
+        for l in lotes:
+            if not l.prod.prod_nombre in prds:
+                prds[l.prod.prod_nombre]=dict()
+                prds[l.prod.prod_nombre]['prod']=l.prod
+                prds[l.prod.prod_nombre]['cantidad']=obtener_lote_cant(l)
+            else:
+                prds[l.prod.prod_nombre]['cantidad']+=obtener_lote_cant(l)
+        datos['prds'] = prds
+        result.append(datos)
+    almacenesf = list()
+    for ele in result:
+        datos = dict()
+        datos['alm'] = ele['alm']
+        datos['prds'] = list()
+        for p in ele['prds']:
+            datos['prds'].append(ele['prds'][p])
+        almacenesf.append(datos)
+    return almacenesf
+
+def obtener_almacend(alm):
+    lotes = LoteTb.objects.filter(lot_estado=1, alm=alm)
+    prods_cants = dict()
+    for l in lotes:
+        if not l.prod.prod_nombre in prods_cants:
+            prods_cants[l.prod.prod_nombre] = dict()
+            prods_cants[l.prod.prod_nombre]['prod'] = l.prod
+            prods_cants[l.prod.prod_nombre]['cantidad'] = obtener_lote_cant(l)
+        else:
+            prods_cants[l.prod.prod_nombre]['cantidad'] += obtener_lote_cant(l)
+    stock_list = list()
+    for dkey in prods_cants:
+        stock_list.append(prods_cants[dkey])
+    return stock_list    
+
+def gest_ns_view(request):
+    if request.method == 'GET':
+        if 'userid' in request.session:
+            emp = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0].emp
+            if not emp.es_admin():
+                return render(request, 'restaurant/errorPage.html')
+        else:
+            return render(request, 'restaurant/errorPage.html')
+    
+    if request.method == 'GET':
+        notas = NotasalidaTb.objects.filter(nots_estado = 1)
+        return render(request, 'restaurant/gestionarNS.html', {'notass':notas})
+    else:
+        if 'registrarBtn' in request.POST:
+            almacenes = obtener_almacenes_detalle()
+            return render(request, 'restaurant/registrarNS.html', {'almacenes':almacenes, 'seccion1':True})
+        elif 'registrar2' in request.POST:
+            if 'alm' in request.POST:
+                almacen = AlmacenTb.objects.filter(alm_id=request.POST['alm'])[0]
+                astock = obtener_almacend(almacen)
+                return render(request, 'restaurant/registrarNS.html', {'almacen':almacen, 'stock':astock, 'seccion2':True})
+            else:
+                almacenes = obtener_almacenes_detalle()
+                msg="Seleccione un almacen antes de continuar"
+                return render(request, 'restaurant/registrarNS.html', {'almacenes':almacenes, 'seccion1':True, 'msg':msg})
+        elif 'registrarNS' in request.POST:
+            almacen = AlmacenTb.objects.filter(alm_nombre=request.POST['almacen'])[0]
+            productos = ProductoTb.objects.all()
+            plista = list()
+            for p in productos:
+                datos = dict()
+                if p.prod_nombre in request.POST:
+                    datos['prd'] = p
+                    sname = p.prod_nombre + 'S'
+                    datos['stock'] = int(request.POST[sname])
+                    cname = p.prod_nombre + 'C'
+                    cantidad = request.POST[cname]
+                    if cantidad.isnumeric() and int(cantidad)<=datos['stock']:
+                        datos['cantidad'] = int(cantidad)
+                    else:
+                        astock = obtener_almacend(almacen)
+                        msg = "Rellene correctamente las cantidades, recuerde que no debe superar el stock"
+                        return render(request, 'restaurant/registrarNS.html', {'almacen':almacen, 'stock':astock, 'seccion2':True, 'msg':msg})
+                    plista.append(datos)
+            if len(plista)>0:
+                eluser = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0]
+                fecha = datetime.date.today()
+                nu_ns = NotasalidaTb(nots_fecha=fecha, nots_estado=1, usu=eluser, alm=almacen)
+                nu_ns.save()
+                for det in plista:
+                    lotes = LoteTb.objects.filter(lot_estado=1, prod=det['prd'], alm=almacen)
+                    saldo = det['cantidad']
+                    for l in lotes:
+                        lsaldo = obtener_lote_cant(l)
+                        if lsaldo >= saldo:
+                            numov = MovimientoloteTb(lot=l, cant=-saldo)
+                            numov.save()
+                            saldo = 0
+                            if obtener_lote_cant(l) == 0:
+                                l.lot_estado = 0 
+                                l.save()
+                            nu_detalla_nsp = NsalidaxproductoTb(nsp_cantidad=det['cantidad'], prod=l.prod, nots=nu_ns)
+                            nu_detalla_nsp.save()
+                            break
+                        else:
+                            saldo -= lsaldo
+                            numov = MovimientoloteTb(lot=l, cant=-lsaldo)
+                            numov.save()
+                            l.lot_estado = 0 
+                            l.save()
+                registrarAccion(15, eluser)
+                return HttpResponseRedirect(reverse('restaurant:gestionarNS'))
+            else:
+                astock = obtener_almacend(almacen)
+                msg = "Seleccione almenos un producto para registrar la nota de salida a produccion"
+                return render(request, 'restaurant/registrarNS.html', {'almacen':almacen, 'stock':astock, 'seccion2':True, 'msg':msg})                
+        elif 'verBtn' in request.POST:
+            ns = NotasalidaTb.objects.filter(nots_id=request.POST['verBtn'])[0]
+            detalle = NsalidaxproductoTb.objects.filter(nots=ns)
+            return render(request, 'restaurant/verNS.html', {'ns':ns, 'detalle':detalle})
+        elif 'eliminarBtn' in request.POST:
+            ns = NotasalidaTb.objects.filter(nots_id=request.POST['eliminarBtn'])[0]
+            return render(request, 'restaurant/eliminarNS.html', {'ns':ns})
+        elif 'eliminarNS' in request.POST:
+            ns = NotasalidaTb.objects.filter(nots_id=request.POST['eliminarNS'])[0]
+            ns.nots_estado = 0
+            ns.save()
+            return HttpResponseRedirect(reverse('restaurant:gestionarNS'))
+        elif 'cancelarEliminar' in request.POST:
+            return HttpResponseRedirect(reverse('restaurant:gestionarNS'))

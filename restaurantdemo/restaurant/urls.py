@@ -24,5 +24,6 @@ urlpatterns = [
     path('gestNC/', views.gest_nota_compra_view, name="gestionarNC"),
     path('gestNE/', views.gest_nota_entrada_view, name="gestionarNE"),
     path('gestAlmacen/', views.gest_almacen, name="gestionarAlmacen"),
-    path('gestLotes/', views.gest_lote_view, name="gestionarLote")    
+    path('gestLotes/', views.gest_lote_view, name="gestionarLote"),
+    path('gestNS/', views.gest_ns_view, name="gestionarNS")
 ]
