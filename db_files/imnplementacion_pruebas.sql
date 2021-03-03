@@ -43,6 +43,9 @@ insert into accion_tb (acc_nombre) values
 insert into accion_tb (acc_nombre) values 
 ('registrar categoria');
 
+insert into accion_tb (acc_nombre) values 
+('registrar menu');
+
 select * from accion_tb;
 
 select * from bitacora_tb;
@@ -64,7 +67,7 @@ alter table lote_tb add column lot_estado int default 1;
 
 select * from notasalida_tb;
 
-
+select * from categoria_tb;
 -- ==============================
 -- MODIFYING COMPRAXPRODUCTOS TABLE
 -- ==============================
@@ -153,9 +156,11 @@ alter table notasalida_tb add column nots_estado int default 1;
 select * from categoria_tb;
 alter table categoria_tb add column cat_estado int default 1;
 
-
-
-
+-- ==============================
+-- MODIFYING MENU
+-- ==============================
+select * from menu_tb;
+alter table menu_tb add column men_estado int default 1;
 
 
 

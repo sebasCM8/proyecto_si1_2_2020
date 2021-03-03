@@ -26,5 +26,6 @@ urlpatterns = [
     path('gestAlmacen/', views.gest_almacen, name="gestionarAlmacen"),
     path('gestLotes/', views.gest_lote_view, name="gestionarLote"),
     path('gestNS/', views.gest_ns_view, name="gestionarNS"),
-    path('gestCategoria/', views.gest_categoria_view, name="gestionarCategoria")
+    path('gestCategoria/', views.gest_categoria_view, name="gestionarCategoria"),
+    path('gestionarMenu/', views.gest_menu_view, name="gestionarMenu")
 ]

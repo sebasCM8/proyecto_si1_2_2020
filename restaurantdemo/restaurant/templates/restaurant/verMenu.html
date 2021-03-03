@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ver menu</title>
+
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/gestionarMenu.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1>Menu: {{me.men_id}}</h1>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Nombre:</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="">{{me.men_nombre}}</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Categoria:</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="">{{me.cat.cat_nombre}}</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Precio:</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="">{{me.men_precio}}</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <h6>Descripcion:</h6>
+                        <p>{{me.men_desc}}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'restaurant:gestionarMenu' %}" class="btn btn-outline-dark">Volver a menus</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

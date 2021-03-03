@@ -1,6 +1,7 @@
 from django.shortcuts import render, HttpResponseRedirect, reverse, redirect
-from .models import EmpleadoTb, UsuarioTb, CargoTb, EmpleadoxcargoTb, ProveedorTb, AccionTb, BitacoraTb, NitTb, ProductoTb, NotacompraTb, NcompraxproductoTb, NotaentradaTb, NentradaxproductoTb, AlmacenTb, LoteTb, MovimientoloteTb, NotasalidaTb, NsalidaxproductoTb, CategoriaTb
+from .models import EmpleadoTb, UsuarioTb, CargoTb, EmpleadoxcargoTb, ProveedorTb, AccionTb, BitacoraTb, NitTb, ProductoTb, NotacompraTb, NcompraxproductoTb, NotaentradaTb, NentradaxproductoTb, AlmacenTb, LoteTb, MovimientoloteTb, NotasalidaTb, NsalidaxproductoTb, CategoriaTb, MenuTb
 import datetime
+import re
 
 # Create your views here.
 
@@ -1228,3 +1229,92 @@ def gest_categoria_view(request):
                 cat.cat_nombre = nu_nombre
                 cat.save()
             return HttpResponseRedirect(reverse('restaurant:gestionarCategoria'))
+# =================================
+# == GESTIONAR MENU =====
+# ================================
+def es_decimal(cadena):
+    if '.' in cadena:
+        x = re.findall('^[0-9][0-9]*[.]{1}[0-9]*[1-9]+$', cadena)
+        if len(x)>0: return True
+        else: return False
+    else:
+        x = re.findall('^[1-9][0-9]*$', cadena)
+        if len(x)>0: return True
+        else: return False
+    print(x)
+
+def gest_menu_view(request):
+    if request.method == 'GET':
+        if 'userid' in request.session:
+            user = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0]
+            if not user.emp.es_admin():
+                return render(request, 'restaurant/errorPage.html')
+        else:
+            return render(request, 'restaurant/errorPage.html')
+    
+    if request.method == 'GET':
+        menus = MenuTb.objects.filter(men_estado=1)
+        return render(request, 'restaurant/gestionarMenu.html', {'menus':menus})
+    else:
+        if 'registrarBtn' in request.POST:
+            categorias = CategoriaTb.objects.filter(cat_estado=1)
+            return render(request, 'restaurant/registrarMenu.html', {'categorias':categorias})
+        elif 'registrarMenu' in request.POST:
+            categorias = CategoriaTb.objects.filter(cat_estado=1)
+            if 'cat' in request.POST:
+                categoria = CategoriaTb.objects.filter(cat_id=request.POST['cat'])[0]
+                m_nombre = request.POST['men_nombre']
+                m_desc = request.POST['men_desc']
+                m_precio = request.POST['men_precio']
+                if m_nombre != "" and m_desc != "" and es_decimal(m_precio):
+                    menus = MenuTb.objects.filter(men_nombre=m_nombre)
+                    if len(menus) > 0:
+                        msg = "Menu ya registrado"
+                        return render(request, 'restaurant/registrarMenu.html', {'categorias':categorias, 'msg':msg})
+                    precio = float(m_precio)
+                    nu_menu = MenuTb(cat=categoria, men_nombre=m_nombre, men_desc=m_desc, men_precio=precio, men_estado=1)
+                    nu_menu.save()
+
+                    user = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0]
+                    registrarAccion(17, user)
+                    
+                    msg = "Menu registrado con exito.."
+                    return render(request, 'restaurant/registrarMenu.html', {'categorias':categorias, 'msg':msg, 'ok':True})
+                else:
+                    msg = "Rellene los campos correctamente"
+                    return render(request, 'restaurant/registrarMenu.html', {'categorias':categorias, 'msg':msg})
+            else:
+                msg = "Seleccione un almacen"
+                return render(request, 'restaurant/registrarMenu.html', {'categorias':categorias, 'msg':msg})
+        elif 'verBtn' in request.POST:
+            men = MenuTb.objects.filter(men_id=request.POST['verBtn'])[0]
+            return render(request, 'restaurant/verMenu.html', {'me':men})
+        elif 'eliminarBtn' in request.POST:
+            men = MenuTb.objects.filter(men_id=request.POST['eliminarBtn'])[0]
+            return render(request, 'restaurant/eliminarMenu.html', {'me':men})
+        elif 'eliminarMenu' in request.POST:
+            men = MenuTb.objects.filter(men_id=request.POST['eliminarMenu'])[0]
+            men.men_estado = 0
+            men.save()
+            return HttpResponseRedirect(reverse('restaurant:gestionarMenu'))
+        elif 'cancelarEliminar' in request.POST:
+            return HttpResponseRedirect(reverse('restaurant:gestionarMenu'))
+        elif 'editarBtn' in request.POST:
+            men = MenuTb.objects.filter(men_id=request.POST['editarBtn'])[0]
+            return render(request, 'restaurant/editarMenu.html', {'me':men})
+        elif 'editarMenu' in request.POST:
+            men = MenuTb.objects.filter(men_id=request.POST['editarMenu'])[0]
+            nu_nombre = request.POST['men_nombre']
+            nu_desc = request.POST['men_desc']
+            nu_precio = request.POST['men_precio']
+            if nu_nombre != "" and nu_nombre != men.men_nombre:
+                men.men_nombre = nu_nombre
+                men.save()
+            if nu_desc != "" and nu_desc != men.men_desc:
+                men.men_desc = nu_desc
+                men.save()
+            if es_decimal(nu_precio) and nu_precio != men.men_precio:
+                men.men_precio = float(nu_precio)
+                men.save()
+            return HttpResponseRedirect(reverse('restaurant:gestionarMenu'))
+        

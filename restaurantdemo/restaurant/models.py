@@ -24,6 +24,7 @@ class MenuTb(models.Model):
     men_nombre = models.CharField(max_length=20, blank=True, null=True)
     men_desc = models.CharField(max_length=50, blank=True, null=True)
     men_precio = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    men_estado = models.IntegerField(db_column='men_estado')
 
     class Meta:
         managed = False

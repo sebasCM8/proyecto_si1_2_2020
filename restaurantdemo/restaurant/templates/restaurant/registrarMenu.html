@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Menu</title>
+
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/gestionarMenu.css' %}">
+
+    <script type="text/javascript" src="{% static 'bootstrap/jquery-3.5.1.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/popper.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/bootstrap.min.js' %}"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1>Nuevo menu</h1>
+            </div>
+            <div class="card-body">
+                <form action="{% url 'restaurant:gestionarMenu' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>Seleccione la categoria:</h4>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-secondary" type="button" data-toggle="collapse"
+                                data-target="#categoria" aria-expanded="false" aria-controls="categoria">
+                                Categoria
+                            </button> <br/><br/>
+                            <div class="collapse" id="categoria">
+                                {% for c in categorias %}
+                                <div class="form-check">
+                                    <input type="radio" name="cat" id="{{c.cat_id}}" value="{{c.cat_id}}"
+                                        class="form-check-input">
+                                    <label for="{{c.cat_id}}">{{c.cat_nombre}}</label>
+                                </div>
+                                <br />
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="form-group">
+                        <input type="text" class="form-control" maxlength="20" name="men_nombre" placeholder="Nombre del menu">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="men_desc" maxlength="50" placeholder="Descrpcion breve">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="men_precio" maxlength="10" placeholder="Precio del menu">
+                    </div>
+                    <button class="btn btn-outline-warning" name="registrarMenu">Registrar menu</button>
+                </form>
+            </div>
+            <div class="card-footer">
+                {% if ok %}
+                <label for="" style="color: green;">{{msg}}</label>
+                {% else %}
+                <label for="" style="color: red;">{{msg}}</label>
+                {% endif %}
+            </div>
+        </div>
+        <br />
+        <a href="{% url 'restaurant:gestionarMenu' %}" class="btn btn-light">Volver a menus</a>
+        <br /><br />
+    </div>
+</body>
+
+</html>

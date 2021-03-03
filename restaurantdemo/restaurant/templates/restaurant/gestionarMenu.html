@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Menu</title>
+
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/gestionarMenu.css' %}">
+    <link rel="stylesheet" href="{% static 'fontAwesome/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/homeButton.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="homeButtonContainer">
+            <a href="{% url 'restaurant:home' %}"><img class="homeButtonImage"
+                    src="{% static 'restaurant/restaurantIcon.jpg' %}" alt="Restaurante Los Abuelos"></a>
+        </div>
+        <form action="{% url 'restaurant:gestionarMenu' %}" method="POST">
+            {% csrf_token %}
+            <div class="gmenuHeader">
+                <h1>Gestionar Menu .-</h1>
+                <p>Agregar nuevo menu
+                    <button name="registrarBtn" class="btn btn-primary">
+                        <i class="fas fa-plus-circle"></i>
+                    </button>
+                </p>
+            </div>
+            <div class="gmenuBody">
+                <h4>Menus registrados</h4><br/>
+                <div class="row">
+                    <div class="col-md-3">
+                        <h4>Nombre</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <h4>Categoria</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <h4>Precio</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <h4>Opciones</h4>
+                    </div>
+                </div>
+                <br/>
+                {% for me in menus %}
+                <div class="row">
+                    <div class="col-md-3">
+                        <label for="">{{me.men_nombre}}</label>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="">{{me.cat.cat_nombre}}</label>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="">{{me.men_precio}}</label>
+                    </div>
+                    <div class="col-md-3">
+                        <button name="verBtn" value="{{me.men_id}}" class="btn btn-info">Ver</button>
+                        <button name="editarBtn" value="{{me.men_id}}" class="btn btn-warning">Editar</button>
+                        <button name="eliminarBtn" value="{{me.men_id}}" class="btn btn-danger">Eliminar</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </form>
+    </div>
+</body>
+</html>

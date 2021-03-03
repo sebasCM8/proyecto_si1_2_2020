@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Menu</title>
+
+    
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/gestionarMenu.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1>Editar menu</h1>
+            </div>
+            <div class="card-body">
+                <form action="{% url 'restaurant:gestionarMenu' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <input type="text" class="form-control" maxlength="20" name="men_nombre" value="{{me.men_nombre}}" placeholder="Nombre del menu">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="men_desc" maxlength="50" value="{{me.men_desc}}" placeholder="Descrpcion breve">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="men_precio" maxlength="10" value="{{me.men_precio}}" placeholder="Precio del menu">
+                    </div>
+                    <button class="btn btn-outline-warning" value="{{me.men_id}}" name="editarMenu">Guardar cambios</button>
+                </form>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'restaurant:gestionarMenu' %}" class="btn btn-dark">Cancelar</a>
+            </div>
+        </div>
+        <br />
+        <br /><br />
+    </div>
+</body>
+</html>
