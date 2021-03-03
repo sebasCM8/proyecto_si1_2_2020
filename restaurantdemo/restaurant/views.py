@@ -675,6 +675,10 @@ def gest_producto_view(request):
         elif 'eliminarProducto' in request.POST:
             producto = ProductoTb.objects.filter(prod_id=request.POST['eliminarProducto'])[0]
             notasc = NcompraxproductoTb.objects.filter(prod=producto)
+            lotes = LoteTb.objects.filter(prod=producto)
+            if len(lotes)>0:
+                msg = "Este producto tiene lotes en almacen, no puede ser eliminado"
+                return render(request, 'restaurant/eliminarProducto.html', {'producto':producto, 'msg':msg})
             if len(notasc)>0:
                 msg = "Este producto tiene notas de compra, primero elimine esas notas si desea eliminar el producto"
                 return render(request, 'restaurant/eliminarProducto.html', {'producto':producto, 'msg':msg})
@@ -682,7 +686,6 @@ def gest_producto_view(request):
             if len(notase)>0:
                 msg = "Este producto tiene notas de entrada, primero elimine esas notas si desea eliminar el producto"
                 return render(request, 'restaurant/eliminarProducto.html', {'producto':producto, 'msg':msg})
-
             producto.delete()
             return HttpResponseRedirect(reverse('restaurant:gestionarProducto'))
         elif 'cancelarEliminar' in request.POST:
@@ -942,6 +945,10 @@ def gest_almacen(request):
             return HttpResponseRedirect(reverse('restaurant:gestionarAlmacen'))
         elif 'eliminarAlm' in request.POST:
             almacen = AlmacenTb.objects.filter(alm_id=request.POST['eliminarAlm'])[0]
+            lotes = LoteTb.objects.filter(alm=almacen)
+            if len(lotes)>0:
+                msg = 'Este almacen tiene lotes, no puede ser eliminado'
+                return render(request, 'restaurant/eliminarAlmacen.html', {'alm':almacen, 'msg':msg})
             almacen.delete()
             return HttpResponseRedirect(reverse('restaurant:gestionarAlmacen'))
 # =================================
