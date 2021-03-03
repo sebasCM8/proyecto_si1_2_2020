@@ -25,5 +25,6 @@ urlpatterns = [
     path('gestNE/', views.gest_nota_entrada_view, name="gestionarNE"),
     path('gestAlmacen/', views.gest_almacen, name="gestionarAlmacen"),
     path('gestLotes/', views.gest_lote_view, name="gestionarLote"),
-    path('gestNS/', views.gest_ns_view, name="gestionarNS")
+    path('gestNS/', views.gest_ns_view, name="gestionarNS"),
+    path('gestCategoria/', views.gest_categoria_view, name="gestionarCategoria")
 ]

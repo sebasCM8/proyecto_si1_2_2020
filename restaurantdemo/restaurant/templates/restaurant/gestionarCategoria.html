@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Categoria</title>
+
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/gestionarCategoria.css' %}">
+    <link rel="stylesheet" href="{% static 'fontAwesome/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/homeButton.css' %}">
+</head>
+
+<body>
+    <div class="container">
+        <div class="homeButtonContainer">
+            <a href="{% url 'restaurant:home' %}"><img class="homeButtonImage"
+                    src="{% static 'restaurant/restaurantIcon.jpg' %}" alt="Restaurante Los Abuelos"></a>
+        </div>
+        <form action="{% url 'restaurant:gestionarCategoria' %}" method="POST">
+            {% csrf_token %}
+            <div class="gcHeader">
+                <h1>Gestionar Categorias.-</h1>
+                <p>Agregar nueva categoria
+                    <button name="registrarBtn" class="btn btn-primary">
+                        <i class="fas fa-plus-circle"></i>
+                    </button>
+                </p>
+            </div>
+            <div class="gcBody">
+                <h4>G categoria body</h4>
+                <hr>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Nombre</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <h4>Opciones</h4>
+                    </div>
+                </div>
+                <br/>
+                {% for c in cats %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="">{{c.cat_nombre}}</label>
+                    </div>
+                    <div class="col-md-6">
+                        <button name="editarBtn" value="{{c.cat_id}}" class="btn btn-info">Editar</button>
+                    </div>
+                </div>
+                <hr>
+                {% endfor %}
+            </div>
+        </form>
+    </div>
+</body>
+
+</html>

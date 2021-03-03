@@ -40,6 +40,9 @@ insert into accion_tb (acc_nombre) values
 insert into accion_tb (acc_nombre) values 
 ('registrar notaSalida');
 
+insert into accion_tb (acc_nombre) values 
+('registrar categoria');
+
 select * from accion_tb;
 
 select * from bitacora_tb;
@@ -143,6 +146,25 @@ select * from nsalidaxproducto_tb;
 -- ==============================
 select * from notasalida_tb;
 alter table notasalida_tb add column nots_estado int default 1;
+
+-- ==============================
+-- MODIFYING CATEGORIA
+-- ==============================
+select * from categoria_tb;
+alter table categoria_tb add column cat_estado int default 1;
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

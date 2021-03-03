@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponseRedirect, reverse, redirect
-from .models import EmpleadoTb, UsuarioTb, CargoTb, EmpleadoxcargoTb, ProveedorTb, AccionTb, BitacoraTb, NitTb, ProductoTb, NotacompraTb, NcompraxproductoTb, NotaentradaTb, NentradaxproductoTb, AlmacenTb, LoteTb, MovimientoloteTb, NotasalidaTb, NsalidaxproductoTb
+from .models import EmpleadoTb, UsuarioTb, CargoTb, EmpleadoxcargoTb, ProveedorTb, AccionTb, BitacoraTb, NitTb, ProductoTb, NotacompraTb, NcompraxproductoTb, NotaentradaTb, NentradaxproductoTb, AlmacenTb, LoteTb, MovimientoloteTb, NotasalidaTb, NsalidaxproductoTb, CategoriaTb
 import datetime
 
 # Create your views here.
@@ -1182,3 +1182,49 @@ def gest_ns_view(request):
             return HttpResponseRedirect(reverse('restaurant:gestionarNS'))
         elif 'cancelarEliminar' in request.POST:
             return HttpResponseRedirect(reverse('restaurant:gestionarNS'))
+# =================================
+# == GESTIONAR CATEGORIA =====
+# ================================
+def gest_categoria_view(request):
+    if request.method == 'GET':
+        if 'userid' in request.session:
+            user = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0]
+            if not user.emp.es_admin():
+                return render(request, 'restaurant/errorPage.html')
+        else:
+            return render(request, 'restaurant/errorPage.html')
+
+    if request.method == 'GET':
+        cats = CategoriaTb.objects.filter(cat_estado=1)
+        return render(request, 'restaurant/gestionarCategoria.html', {'cats':cats})
+    else:
+        if 'registrarBtn' in request.POST:
+            return render(request, 'restaurant/registrarCategoria.html')
+        elif 'registrarCategoria' in request.POST:
+            cat_nombre = request.POST['cat_nombre']
+            if cat_nombre != "":
+                categorias = CategoriaTb.objects.filter(cat_nombre=cat_nombre)
+                if len(categorias) > 0:
+                    msg = "Categoria ya registrada.."
+                    return render(request, 'restaurant/registrarCategoria.html', {'msg':msg})
+                nu_cat = CategoriaTb(cat_nombre=cat_nombre, cat_estado=1)
+                nu_cat.save()
+                
+                user = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0]
+                registrarAccion(16, user)
+
+                msg = "Categoria registrada correctamente"
+                return render(request, 'restaurant/registrarCategoria.html', {'msg':msg, 'ok':True})
+            else:
+                msg = "Rellene los campos para registrar la categoria.."
+                return render(request, 'restaurant/registrarCategoria.html', {'msg':msg})
+        elif 'editarBtn' in request.POST:
+            cat = CategoriaTb.objects.filter(cat_id=request.POST['editarBtn'])[0]
+            return render(request, 'restaurant/editarCategoria.html', {'cat':cat})
+        elif 'editarCategoria' in request.POST:
+            cat = CategoriaTb.objects.filter(cat_id=request.POST['editarCategoria'])[0]
+            nu_nombre = request.POST['cat_nombre']
+            if nu_nombre != "" and nu_nombre != cat.cat_nombre:
+                cat.cat_nombre = nu_nombre
+                cat.save()
+            return HttpResponseRedirect(reverse('restaurant:gestionarCategoria'))

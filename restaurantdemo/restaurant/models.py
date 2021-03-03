@@ -12,6 +12,7 @@ from django.db import models
 class CategoriaTb(models.Model):
     cat_id = models.AutoField(primary_key=True)
     cat_nombre = models.CharField(max_length=20, blank=True, null=True)
+    cat_estado = models.IntegerField(db_column='cat_estado')
 
     class Meta:
         managed = False

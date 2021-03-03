@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Categoria</title>
+
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/gestionarCategoria.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1>Nueva categoria.-</h1>
+            </div>
+            <div class="card-body">
+                <form action="{% url 'restaurant:gestionarCategoria' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <input type="text" maxlength="20" name="cat_nombre" class="form-control">
+                    </div>
+                    <button class="btn btn-primary" name="registrarCategoria">Registrar categoria</button>
+                </form>
+            </div>
+            <div class="card-footer">
+                {% if ok %}
+                <label for="" style="color:green">{{msg}}</label>
+                {% else %}
+                <label for="" style="color:red">{{msg}}</label>
+                {% endif %}
+            </div>
+        </div>
+        <br/><br/>
+        <a href="{% url 'restaurant:gestionarCategoria' %}" class="btn btn-light">Volver a categorias</a>
+        <br/>
+    </div>
+</body>
+</html>
