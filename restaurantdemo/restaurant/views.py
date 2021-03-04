@@ -4,7 +4,7 @@ import datetime
 import re
 
 # Create your views here.
-
+# rama de carol la gigi
 
 def home_page(request):
     if 'userid' in request.session:
