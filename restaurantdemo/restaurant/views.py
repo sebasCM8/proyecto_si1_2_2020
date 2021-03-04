@@ -65,7 +65,7 @@ def registrar_empleados(request):
 
                 fecha = datetime.date.today()
                 hora = datetime.datetime.now().time()
-                accion = AccionTb.objects.filter(acc_id=1)[0]
+                accion = AccionTb.objects.filter(acc_id=3)[0] # registrar usuario = accion "3"
                 eluser = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0]
                 registrarAccion = BitacoraTb(bit_fecha=fecha, bit_hora=hora, usu=eluser, acc=accion)
                 registrarAccion.save()
@@ -207,7 +207,7 @@ def registrar_usuario(request):
 
             fecha = datetime.date.today()
             hora = datetime.datetime.now().time()
-            accion = AccionTb.objects.filter(acc_id=4)[0]
+            accion = AccionTb.objects.filter(acc_id=6)[0] #cambie 4 por 6
             eluser = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0]
             registrarAccion = BitacoraTb(bit_fecha=fecha, bit_hora=hora, usu=eluser, acc=accion)
             registrarAccion.save()
@@ -290,7 +290,7 @@ def registrar_cargo(request):
 
                 fecha = datetime.date.today()
                 hora = datetime.datetime.now().time()
-                accion = AccionTb.objects.filter(acc_id=2)[0]
+                accion = AccionTb.objects.filter(acc_id=4)[0]
                 eluser = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0]
                 registrarAccion = BitacoraTb(bit_fecha=fecha, bit_hora=hora, usu=eluser, acc=accion)
                 registrarAccion.save()
@@ -379,7 +379,7 @@ def login_view(request):
 
                         fecha = datetime.date.today()
                         hora = datetime.datetime.now().time()
-                        accion = AccionTb.objects.filter(acc_id=5)[0]
+                        accion = AccionTb.objects.filter(acc_id=1)[0]   #mi inicio de sesion es accion 1 que cambie por 5
                         registrarAccion = BitacoraTb(bit_fecha=fecha, bit_hora=hora, usu=eluser, acc=accion)
                         registrarAccion.save()
 
@@ -405,7 +405,7 @@ def logoutAction(request):
         eluser = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0]
         fecha = datetime.date.today()
         hora = datetime.datetime.now().time()
-        accion = AccionTb.objects.filter(acc_id=6)[0]
+        accion = AccionTb.objects.filter(acc_id=2)[0] #cambie 6 por 2
         registrarAccion = BitacoraTb(bit_fecha=fecha, bit_hora=hora, usu=eluser, acc=accion)
         registrarAccion.save()
         
@@ -442,7 +442,7 @@ def gestionar_proveedor_vista(request):
 
                 fecha = datetime.date.today()
                 hora = datetime.datetime.now().time()
-                accion = AccionTb.objects.filter(acc_id=3)[0]
+                accion = AccionTb.objects.filter(acc_id=5)[0]
                 eluser = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0]
                 registrarAccion = BitacoraTb(bit_fecha=fecha, bit_hora=hora, usu=eluser, acc=accion)
                 registrarAccion.save()                    
