@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar racion de venta</title>
+
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/gestionarConversion.css' %}">
+    <link rel="stylesheet" href="{% static 'fontAwesome/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/homeButton.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="homeButtonContainer">
+            <a href="{% url 'restaurant:home' %}"><img class="homeButtonImage"
+                    src="{% static 'restaurant/restaurantIcon.jpg' %}" alt="Restaurante Los Abuelos"></a>
+        </div>
+        <form action="{% url 'restaurant:gestionarCon' %}" method="POST">
+            {% csrf_token %}
+            <div class="gconHeader">
+                <h1>Gestionar Raciones .-</h1>
+                <p>Agregar nueva racion
+                    <button name="registrarBtn" class="btn btn-primary">
+                        <i class="fas fa-plus-circle"></i>
+                    </button>
+                </p>
+            </div>
+            <div class="gconBody">
+                <h4>Raciones registradas:</h4>
+                <br/>
+                <div class="row">
+                    <div class="col-md-4">
+                        <h4>Producto</h4>
+                    </div>
+                    <div class="col-md-4">
+                        <h4>Cantidad de racion</h4>
+                    </div>
+                    <div class="col-md-4">
+                        <h4>Opciones</h4>
+                    </div>
+                </div>
+                {% for ra in conversiones%}
+                <div class="row">
+                    <div class="col-md-4">
+                        <label for="">{{ra.prod.prod_nombre}}</label>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="">{{ra.cv_cantidad}}</label>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-info" name="editarBtn" value="{{ra.cv_id}}">Editar</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </form>
+    </div>
+</body>
+</html>

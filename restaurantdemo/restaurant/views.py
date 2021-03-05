@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponseRedirect, reverse, redirect
-from .models import EmpleadoTb, UsuarioTb, CargoTb, EmpleadoxcargoTb, ProveedorTb, AccionTb, BitacoraTb, NitTb, ProductoTb, NotacompraTb, NcompraxproductoTb, NotaentradaTb, NentradaxproductoTb, AlmacenTb, LoteTb, MovimientoloteTb, NotasalidaTb, NsalidaxproductoTb, CategoriaTb, MenuTb
+from .models import EmpleadoTb, UsuarioTb, CargoTb, EmpleadoxcargoTb, ProveedorTb, AccionTb, BitacoraTb, NitTb, ProductoTb, NotacompraTb, NcompraxproductoTb, NotaentradaTb, NentradaxproductoTb, AlmacenTb, LoteTb, MovimientoloteTb, NotasalidaTb, NsalidaxproductoTb, CategoriaTb, MenuTb, ConversionVenta
 import datetime
 import re
 
@@ -560,7 +560,7 @@ def gest_nit_view(request):
     if request.method == 'GET':
         if 'userid' in request.session:
             empleado = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0].emp
-            if empleado.es_admin() == False:
+            if (not empleado.es_admin()) and (not empleado.es_cajero()):
                 return render(request, 'restaurant/errorPage.html')
         else:
             return render(request, 'restaurant/errorPage.html')
@@ -676,6 +676,10 @@ def gest_producto_view(request):
         elif 'eliminarProducto' in request.POST:
             producto = ProductoTb.objects.filter(prod_id=request.POST['eliminarProducto'])[0]
             notasc = NcompraxproductoTb.objects.filter(prod=producto)
+            racion = ConversionVenta.objects.filter(prod=producto)
+            if len(racion) > 0:
+                msg = "Este producto tiene una racion asignada, no puede ser eliminado"
+                return render(request, 'restaurant/eliminarProducto.html', {'producto':producto, 'msg':msg})
             lotes = LoteTb.objects.filter(prod=producto)
             if len(lotes)>0:
                 msg = "Este producto tiene lotes en almacen, no puede ser eliminado"
@@ -1317,4 +1321,60 @@ def gest_menu_view(request):
                 men.men_precio = float(nu_precio)
                 men.save()
             return HttpResponseRedirect(reverse('restaurant:gestionarMenu'))
-        
+# =====================================
+# == GESTIONAR RACION DE PRODUCTO =====
+# =====================================
+def prods_sinracion():
+    productos = ProductoTb.objects.all()
+    plista = list()
+    for p in productos:
+        racion = ConversionVenta.objects.filter(prod=p)
+        if len(racion)==0: plista.append(p)
+    return plista
+
+def gest_racion_view(request):
+    if request.method == 'GET':
+        if 'userid' in request.session:
+            user = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0]
+            if not user.emp.es_admin():
+                return render(request, 'restaurant/errorPage.html')
+        else:
+            return render(request, 'restaurant/errorPage.html')
+    
+    if request.method == 'GET':
+        raciones = ConversionVenta.objects.all()
+        return render(request, 'restaurant/gestConversion.html', {'conversiones':raciones})
+    else:
+        if 'registrarBtn' in request.POST:
+            prods = prods_sinracion()
+            return render(request, 'restaurant/registrarConversion.html', {'productos':prods})
+        elif 'registrarCon' in request.POST:
+            prods = prods_sinracion()
+            if 'prd' in request.POST:
+                producto = ProductoTb.objects.filter(prod_id=request.POST['prd'])[0]
+                cantidad = request.POST['cv_cantidad']
+                if cantidad.isnumeric():
+                    cantidad = int(cantidad)
+                    nu_racion = ConversionVenta(cv_cantidad=cantidad, prod=producto)
+                    nu_racion.save()
+                    msg = "Racion registrada correctamente"
+                    prods = prods_sinracion()
+                    return render(request, 'restaurant/registrarConversion.html', {'productos':prods, 'msg':msg, 'ok':True})
+                else:
+                    msg = "Llene correctamente la cantidad"
+                    return render(request, 'restaurant/registrarConversion.html', {'productos':prods, 'msg':msg})
+            else:
+                msg = "Seleccione un producto"
+                return render(request, 'restaurant/registrarConversion.html', {'productos':prods, 'msg':msg})
+        elif 'editarBtn' in request.POST:
+            racion = ConversionVenta.objects.filter(cv_id=request.POST['editarBtn'])[0]
+            return render(request, 'restaurant/editarConversion.html', {'racion':racion})
+        elif 'editarCon' in request.POST:
+            racion = ConversionVenta.objects.filter(cv_id=request.POST['editarCon'])[0]
+            nu_cantidad = request.POST['cv_cantidad']
+            if nu_cantidad.isnumeric():
+                nu_cantidad = int(nu_cantidad)
+                if nu_cantidad != racion.cv_cantidad and nu_cantidad > 0:
+                    racion.cv_cantidad = nu_cantidad
+                    racion.save()
+            return HttpResponseRedirect(reverse('restaurant:gestionarCon'))

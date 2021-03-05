@@ -64,6 +64,14 @@ class EmpleadoTb(models.Model):
             return True 
         else:
             return False
+    
+    def es_cajero(self):
+        cargos = self.cargotb_set.all()
+        ccajero = CargoTb.objects.filter(car_id=2)[0]
+        if ccajero in cargos: 
+            return True 
+        else:
+            return False
 
 class UsuarioTb(models.Model):
     usu_id = models.AutoField(primary_key=True)
@@ -118,6 +126,15 @@ class ProductoTb(models.Model):
     class Meta:
         managed = False
         db_table = 'producto_tb'
+
+class ConversionVenta(models.Model):
+    cv_id = models.AutoField(primary_key=True)
+    cv_cantidad = models.IntegerField()
+    prod = models.ForeignKey(ProductoTb, on_delete=models.CASCADE)
+
+    class Meta:
+        managed = False
+        db_table = 'conversionventa'
 
 class NotacompraTb(models.Model):
     notc_id = models.AutoField(db_column='notC_id', primary_key=True)  # Field name made lowercase.
