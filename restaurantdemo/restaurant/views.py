@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponseRedirect, reverse, redirect
-from .models import EmpleadoTb, UsuarioTb, CargoTb, EmpleadoxcargoTb, ProveedorTb, AccionTb, BitacoraTb, NitTb, ProductoTb, NotacompraTb, NcompraxproductoTb, NotaentradaTb, NentradaxproductoTb, AlmacenTb, LoteTb, MovimientoloteTb, NotasalidaTb, NsalidaxproductoTb, CategoriaTb, MenuTb, ConversionVenta
+from .models import EmpleadoTb, UsuarioTb, CargoTb, EmpleadoxcargoTb, ProveedorTb, AccionTb, BitacoraTb, NitTb, ProductoTb, NotacompraTb, NcompraxproductoTb, NotaentradaTb, NentradaxproductoTb, AlmacenTb, LoteTb, MovimientoloteTb, NotasalidaTb, NsalidaxproductoTb, CategoriaTb, MenuTb, ConversionVenta, StockVenta
 import datetime
 import re
 
@@ -1168,6 +1168,16 @@ def gest_ns_view(request):
                             l.lot_estado = 0 
                             l.save()
                 registrarAccion(15, eluser)
+
+                for p in plista:
+                    racion = ConversionVenta.objects.filter(prod=p['prd'])
+                    if len(racion)>0:
+                        ra = racion[0]
+                        nsp = NsalidaxproductoTb.objects.filter(prod=p['prd'], nots=nu_ns)[0]
+                        cantidad = ra.cv_cantidad * nsp.nsp_cantidad
+                        nu_stockventa = StockVenta(sv_cantidad=cantidad, cv=ra, ns=nu_ns)
+                        nu_stockventa.save()
+
                 return HttpResponseRedirect(reverse('restaurant:gestionarNS'))
             else:
                 astock = obtener_almacend(almacen)
@@ -1175,8 +1185,9 @@ def gest_ns_view(request):
                 return render(request, 'restaurant/registrarNS.html', {'almacen':almacen, 'stock':astock, 'seccion2':True, 'msg':msg})                
         elif 'verBtn' in request.POST:
             ns = NotasalidaTb.objects.filter(nots_id=request.POST['verBtn'])[0]
+            stock = StockVenta.objects.filter(ns=ns)
             detalle = NsalidaxproductoTb.objects.filter(nots=ns)
-            return render(request, 'restaurant/verNS.html', {'ns':ns, 'detalle':detalle})
+            return render(request, 'restaurant/verNS.html', {'ns':ns, 'detalle':detalle, 'stock':stock})
         elif 'eliminarBtn' in request.POST:
             ns = NotasalidaTb.objects.filter(nots_id=request.POST['eliminarBtn'])[0]
             return render(request, 'restaurant/eliminarNS.html', {'ns':ns})

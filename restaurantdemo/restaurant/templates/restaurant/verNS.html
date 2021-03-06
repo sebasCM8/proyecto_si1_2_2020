@@ -7,11 +7,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ver nota de salida</title>
 
-    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">>
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'restaurant/gestionarNS.css' %}">
 </head>
 <body>
     <div class="container">
+        <br/><br/>
         <div class="card">
             <div class="card-header">
                 <h1>Nota de salida</h1>
@@ -68,11 +69,31 @@
                     </div>
                 </div>
                 {% endfor %}
+                <hr>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Producto</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <h4>Cantidad en stock para ventas</h4>
+                    </div>
+                </div>
+                {% for s in stock %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="">{{s.cv.prod.prod_nombre}}</label>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="">{{s.sv_cantidad}}</label>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
             <div class="card-footer">
                 <a href="{% url 'restaurant:gestionarNS' %}" class="btn btn-secondary">Volver a notas de salida</a>
             </div>
         </div>
+        <br/><br/>
     </div>
 </body>
 </html>

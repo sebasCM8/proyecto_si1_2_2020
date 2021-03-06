@@ -163,10 +163,34 @@ select * from menu_tb;
 alter table menu_tb add column men_estado int default 1;
 
 
+-- ==============================
+-- MODIFYING STOCK VENTA
+-- ==============================
+show create table stockventa;
+select * from stockventa;
 
+alter table stockventa drop foreign key stockventa_ibfk_1;
+alter table stockventa drop foreign key stockventa_ibfk_2;
+alter table stockventa drop primary key;
+alter table stockventa add sv_id int not null auto_increment primary key first;
 
+alter table stockventa drop key ns_id;
 
+ALTER TABLE stockventa ADD CONSTRAINT fk_cv_id FOREIGN KEY (cv_id) REFERENCES conversionventa(cv_id);
+ALTER TABLE stockventa ADD CONSTRAINT fk_ns_id FOREIGN KEY (ns_id) REFERENCES notasalida_tb(notS_id);
 
+drop table stockventa;
+
+CREATE TABLE stockVenta(
+	sv_id int auto_increment,
+	sv_cantidad INT,
+    cv_id INT,
+    ns_id INT,
+    
+    primary key(sv_id),
+    FOREIGN KEY (cv_id) REFERENCES conversionventa (cv_id),
+    FOREIGN KEY (ns_id) REFERENCES notaSalida_tb (notS_id)
+);
 
 
 

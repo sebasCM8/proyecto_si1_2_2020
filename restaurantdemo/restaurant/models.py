@@ -250,6 +250,15 @@ class NotasalidaTb(models.Model):
         db_table = 'notasalida_tb'
 
 
+class StockVenta(models.Model):
+    sv_id = models.AutoField(primary_key=True)
+    sv_cantidad = models.IntegerField()
+    cv = models.ForeignKey(ConversionVenta, on_delete=models.CASCADE)
+    ns = models.ForeignKey(NotasalidaTb, on_delete=models.CASCADE)
+    class Meta:
+        managed = False 
+        db_table = 'stockventa'
+
 class NsalidaxproductoTb(models.Model):
     nsp_id = models.AutoField(db_column='nsp_id', primary_key=True)
     nsp_cantidad = models.IntegerField(blank=True, null=True)
