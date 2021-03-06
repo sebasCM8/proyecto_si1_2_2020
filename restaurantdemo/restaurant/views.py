@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponseRedirect, reverse, redirect
-from .models import EmpleadoTb, UsuarioTb, CargoTb, EmpleadoxcargoTb, ProveedorTb, AccionTb, BitacoraTb, NitTb, ProductoTb, NotacompraTb, NcompraxproductoTb, NotaentradaTb, NentradaxproductoTb, AlmacenTb, LoteTb, MovimientoloteTb, NotasalidaTb, NsalidaxproductoTb, CategoriaTb, MenuTb, ConversionVenta, StockVenta
+from .models import EmpleadoTb, UsuarioTb, CargoTb, EmpleadoxcargoTb, ProveedorTb, AccionTb, BitacoraTb, NitTb, ProductoTb, NotacompraTb, NcompraxproductoTb, NotaentradaTb, NentradaxproductoTb, AlmacenTb, LoteTb, MovimientoloteTb, NotasalidaTb, NsalidaxproductoTb, CategoriaTb, MenuTb, ConversionVenta, StockVenta, PedidoTb, Pedidoxmenu, Recibo
 import datetime
 import re
 
@@ -576,8 +576,9 @@ def gest_nit_view(request):
             nit_nombre = request.POST['nit_nombre']
             if nit_nro.isnumeric() and nit_nombre != "":
                 nit_nro = int(nit_nro)
-                nitdoble = NitTb.objects.filter(nit_numero=nit_nro)
-                if len(nitdoble) == 0:
+                nitdoble_num = NitTb.objects.filter(nit_numero=nit_nro)
+                nitdoble_nom = NitTb.objects.filter(nit_dueno=nit_nombre)
+                if len(nitdoble_num) == 0 and len(nitdoble_nom) == 0:
                     nuevonit = NitTb(nit_dueno=nit_nombre, nit_numero=nit_nro)
                     nuevonit.save()
                     fecha = datetime.date.today()
@@ -1256,7 +1257,11 @@ def es_decimal(cadena):
         x = re.findall('^[1-9][0-9]*$', cadena)
         if len(x)>0: return True
         else: return False
-    print(x)
+
+def es_natural(cadena):
+    x = re.findall('^[1-9][0-9]*$', cadena)
+    if len(x)>0: return True
+    else: return False
 
 def gest_menu_view(request):
     if request.method == 'GET':
@@ -1389,3 +1394,86 @@ def gest_racion_view(request):
                     racion.cv_cantidad = nu_cantidad
                     racion.save()
             return HttpResponseRedirect(reverse('restaurant:gestionarCon'))
+# =================================
+# == GESTIONAR PEDIDO =====
+# ================================
+def gest_pedido_view(request):
+    if request.method == 'GET':
+        if 'userid' in request.session:
+            empleado = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0].emp
+            if (not empleado.es_admin()) and (not empleado.es_cajero()):
+                return render(request, 'restaurant/errorPage.html')
+        else:
+            return render(request, 'restaurant/errorPage.html')
+    
+    if request.method == 'GET':
+        pedidos = PedidoTb.objects.filter(ped_estado=1)
+        return render(request, 'restaurant/gestionarPedidos.html', {'pedidos':pedidos})
+    else:
+        if 'registrarBtn' in request.POST:
+            nits = NitTb.objects.all()
+            menus = MenuTb.objects.filter(men_estado=1)
+            return render(request, 'restaurant/registrarPedido.html', {'seccion1':True, 'menus':menus, 'nits':nits})
+        elif 'siguiente' in request.POST:
+            menus = MenuTb.objects.filter(men_estado=1)
+            nits = NitTb.objects.all()
+            menulista = list()
+            total = 0
+            for m in menus:
+                datos = dict()
+                if m.men_nombre in request.POST:
+                    datos['menu'] = m
+                    cantidadname = str(m.men_id)+'C'
+                    cantidad = request.POST[cantidadname]
+                    if es_natural(cantidad):
+                        datos['cantidad'] = int(cantidad)
+                        datos['subtot'] = m.men_precio * datos['cantidad']
+                        total += datos['subtot']
+                    else:
+                        msg = "Rellene correctamente las cantidades"
+                        return render(request, 'restaurant/registrarPedido.html', {'seccion1':True, 'menus':menus, 'msg':msg, 'nits':nits})
+                    menulista.append(datos)
+            if len(menulista)>0:
+                elnit = None
+                if 'nit' in request.POST:
+                    elnit = NitTb.objects.filter(nit_numero=request.POST['nit'])[0]
+                else:
+                    elnit = NitTb.objects.filter(nit_dueno='sin nit')[0]
+                return render(request, 'restaurant/registrarPedido.html', {'detallepedido': menulista, 'elnit':elnit, 'seccion2':True, 'total':total})
+            else:
+                msg = "Seleccione almenos un producto para realizar un pedido"
+                return render(request, 'restaurant/registrarPedido.html', {'seccion1':True, 'menus':menus, 'msg':msg, 'nits':nits})
+        elif 'confirmarpedido' in request.POST:
+            fecha = datetime.date.today()
+            hora = datetime.datetime.now().time()
+            tipopedido = request.POST['tipop']
+            total = float(request.POST['totalp'])
+            nu_pedido = PedidoTb(ped_fecha=fecha, ped_hora=hora, ped_tipo=tipopedido, ped_total=total, ped_estado=1)
+            nu_pedido.save()
+            menus = MenuTb.objects.filter(men_estado=1)
+
+            user = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0]
+            registrarAccion(18, user)
+
+            for m in menus:
+                name = 'm'+str(m.men_id)
+                if name in request.POST:
+                    cantname = 'c'+ str(m.men_id)
+                    subtotname = 's'+ str(m.men_id)
+                    cantidad = int(request.POST[cantname])
+                    subtot = float(request.POST[subtotname])
+                    nu_pm = Pedidoxmenu(pm_cantidad=cantidad, pm_subtotal=subtot, men=m, ped=nu_pedido)
+                    nu_pm.save()
+
+            thenit = NitTb.objects.filter(nit_numero=request.POST['thenit'])[0]
+            nu_recibo = Recibo(rec_fecha=fecha, rec_hora=hora, rec_total=total, nit=thenit, ped=nu_pedido)
+            nu_recibo.save()
+
+            return HttpResponseRedirect(reverse('restaurant:gestionarPedido'))
+        elif 'verBtn' in request.POST:
+            pedido = PedidoTb.objects.filter(ped_id=request.POST['verBtn'])[0]
+            detalle = Pedidoxmenu.objects.filter(ped=pedido)
+            recib = Recibo.objects.filter(ped=pedido)
+            if len(recib) > 0:
+                recib = recib[0]
+            return render(request, 'restaurant/verPedido.html', {'pedido':pedido, 'detalle':detalle, 'recibo':recib})

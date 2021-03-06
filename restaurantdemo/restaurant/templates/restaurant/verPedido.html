@@ -1,0 +1,86 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ver pedido</title>
+
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/gestionarPedido.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1>Pedido: {{pedido.ped_id}}</h1>
+            </div>
+            <div class="card-body">
+                <label for="">{{pedido.ped_fecha}} - {{pedido.ped_hora}}</label>
+                <h4>Nit: </h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="">{{recibo.nit.nit_dueno}}</label>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="">{{recibo.nit.nit_numero}}</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Tipo de pedido:</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="">{{pedido.ped_tipo}}</label>
+                    </div>
+                </div>
+                <hr>
+                <h4>Detalle:</h4>
+                <div class="row">
+                    <div class="col-md-3">
+                        <h4>Menu</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <h4>Precio</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <h4>Cantidad</h4>
+                    </div>
+                    <div class="col-md-3">
+                        <h4>Subtotal</h4>
+                    </div>
+                </div>
+                {% for d in detalle %}
+                <div class="row">
+                    <div class="col-md-3">
+                        <label for="">{{d.men.men_nombre}}</label>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="">{{d.men.men_precio}}</label>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="">{{d.pm_cantidad}}</label>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="">{{d.pm_subtotal}}</label>
+                    </div>
+                </div>
+                {% endfor %}
+                <hr>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Total:</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="">{{pedido.ped_total}}</label>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'restaurant:gestionarPedido' %}" class="btn btn-dark">Volver a pedidos</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

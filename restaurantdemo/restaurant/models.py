@@ -276,7 +276,7 @@ class PedidoTb(models.Model):
     ped_hora = models.TimeField(blank=True, null=True)
     ped_tipo = models.CharField(max_length=10, blank=True, null=True)
     ped_total = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    nots = models.ForeignKey(NotasalidaTb, on_delete= models.CASCADE, db_column='notS_id')  # Field name made lowercase.
+    ped_estado = models.IntegerField()
 
     detalle = models.ManyToManyField(MenuTb, through='Pedidoxmenu')
 
@@ -285,17 +285,19 @@ class PedidoTb(models.Model):
         db_table = 'pedido_tb'
 
 class Recibo(models.Model):
-    rec_id = models.IntegerField(primary_key=True)
+    rec_id = models.AutoField(primary_key=True)
     rec_fecha = models.DateField(blank=True, null=True)
     rec_hora = models.TimeField(blank=True, null=True)
     rec_total = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
     nit = models.ForeignKey(NitTb, on_delete= models.CASCADE)
+    ped = models.ForeignKey(PedidoTb, on_delete=models.CASCADE)
 
     class Meta:
         managed = False
         db_table = 'recibo'
 
 class Pedidoxmenu(models.Model):
+    pm_id = models.AutoField(primary_key=True)
     pm_cantidad = models.IntegerField(blank=True, null=True)
     pm_subtotal = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     men = models.ForeignKey(MenuTb, on_delete= models.CASCADE)

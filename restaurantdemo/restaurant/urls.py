@@ -28,5 +28,6 @@ urlpatterns = [
     path('gestNS/', views.gest_ns_view, name="gestionarNS"),
     path('gestCategoria/', views.gest_categoria_view, name="gestionarCategoria"),
     path('gestionarMenu/', views.gest_menu_view, name="gestionarMenu"),
-    path('gestConversion/', views.gest_racion_view, name="gestionarCon")
+    path('gestConversion/', views.gest_racion_view, name="gestionarCon"),
+    path('gestPedidos/', views.gest_pedido_view, name="gestionarPedido")
 ]

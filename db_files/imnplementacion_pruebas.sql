@@ -46,6 +46,9 @@ insert into accion_tb (acc_nombre) values
 insert into accion_tb (acc_nombre) values 
 ('registrar menu');
 
+insert into accion_tb (acc_nombre) values 
+('registrar pedido');
+
 select * from accion_tb;
 
 select * from bitacora_tb;
@@ -68,6 +71,8 @@ alter table lote_tb add column lot_estado int default 1;
 select * from notasalida_tb;
 
 select * from categoria_tb;
+
+select * from nit_tb;
 -- ==============================
 -- MODIFYING COMPRAXPRODUCTOS TABLE
 -- ==============================
@@ -192,9 +197,37 @@ CREATE TABLE stockVenta(
     FOREIGN KEY (ns_id) REFERENCES notaSalida_tb (notS_id)
 );
 
+-- ==============================
+-- MODIFYING PEDIDOXMENU
+-- ==============================
+show create table pedidoxmenu;
+alter table pedidoxmenu drop foreign key pedidoxmenu_ibfk_1;
+alter table pedidoxmenu drop foreign key pedidoxmenu_ibfk_2;
+alter table pedidoxmenu drop primary key;
+alter table pedidoxmenu add pm_id int not null auto_increment primary key first;
+ALTER TABLE pedidoxmenu ADD CONSTRAINT fk_men_id FOREIGN KEY (men_id) REFERENCES menu_tb(men_id);
+ALTER TABLE pedidoxmenu ADD CONSTRAINT fk_ped_id FOREIGN KEY (ped_id) REFERENCES pedido_tb(ped_id);
 
 
+-- ==============================
+-- MODIFYING PEDIDO
+-- ==============================
+show create table pedido_tb;
+select * from pedido_tb;
 
+alter table pedido_tb add column ped_estado int default 1;
+alter table pedido_tb drop foreign key pedido_tb_ibfk_1;
+alter table pedido_tb drop column notS_id;
+alter table pedido_tb drop key notS_id;
+
+-- ==============================
+-- MODIFYING RECIBO
+-- ==============================
+show create table recibo;
+select * from recibo;
+alter table recibo add column ped_id int not null default 0;
+ALTER TABLE recibo ADD CONSTRAINT recibo_fk_ped_id FOREIGN KEY (ped_id) REFERENCES pedido_tb(ped_id);
+alter table recibo modify column rec_id int auto_increment;
 
 
 

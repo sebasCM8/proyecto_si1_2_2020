@@ -5,12 +5,12 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestionar Menu</title>
+    <title>Gestionar Pedidos</title>
 
     <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
-    <link rel="stylesheet" href="{% static 'restaurant/gestionarMenu.css' %}">
-    <link rel="stylesheet" href="{% static 'fontAwesome/css/all.min.css' %}">
     <link rel="stylesheet" href="{% static 'restaurant/homeButton.css' %}">
+    <link rel="stylesheet" href="{% static 'fontAwesome/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/gestionarPedido.css' %}">
 </head>
 <body>
     <div class="container">
@@ -18,48 +18,45 @@
             <a href="{% url 'restaurant:home' %}"><img class="homeButtonImage"
                     src="{% static 'restaurant/restaurantIcon.jpg' %}" alt="Restaurante Los Abuelos"></a>
         </div>
-        <form action="{% url 'restaurant:gestionarMenu' %}" method="POST">
+        <form action="{% url 'restaurant:gestionarPedido' %}" method="POST">
             {% csrf_token %}
-            <div class="gmenuHeader">
-                <h1>Gestionar Menu .-</h1>
-                <p>Agregar nuevo menu
+            <div class="gpedHeader">
+                <h1>Gestionar Pedidos.-</h1>
+                <p>Registrar nuevo pedido
                     <button name="registrarBtn" class="btn btn-primary">
                         <i class="fas fa-plus-circle"></i>
                     </button>
                 </p>
             </div>
-            <div class="gmenuBody">
-                <h4>Menus registrados</h4><br/>
+            <div class="gpedBody">
+                <h4>Pedidos body</h4>
                 <div class="row">
                     <div class="col-md-3">
-                        <h4>Nombre</h4>
+                        <h4>Id</h4>
                     </div>
                     <div class="col-md-3">
-                        <h4>Categoria</h4>
+                        <h4>Fecha</h4>
                     </div>
                     <div class="col-md-3">
-                        <h4>Precio</h4>
+                        <h4>Hora</h4>
                     </div>
                     <div class="col-md-3">
                         <h4>Opciones</h4>
                     </div>
                 </div>
-                <br/>
-                {% for me in menus %}
+                {% for p in pedidos %}
                 <div class="row">
                     <div class="col-md-3">
-                        <label for="">{{me.men_nombre}}</label>
+                        <label for="">{{p.ped_id}}</label>
                     </div>
                     <div class="col-md-3">
-                        <label for="">{{me.cat.cat_nombre}}</label>
+                        <label for="">{{p.ped_fecha}}</label>
                     </div>
                     <div class="col-md-3">
-                        <label for="">{{me.men_precio}}</label>
+                        <label for="">{{p.ped_hora}}</label>
                     </div>
                     <div class="col-md-3">
-                        <button name="verBtn" value="{{me.men_id}}" class="btn btn-info">Ver</button>
-                        <button name="editarBtn" value="{{me.men_id}}" class="btn btn-warning">Editar</button>
-                        <button name="eliminarBtn" value="{{me.men_id}}" class="btn btn-danger">Eliminar</button>
+                        <button class="btn btn-info" name="verBtn" value="{{p.ped_id}}">Ver</button>
                     </div>
                 </div>
                 <hr>

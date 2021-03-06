@@ -1,0 +1,198 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Pedido</title>
+
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/gestionarPedido.css' %}">
+
+    <script type="text/javascript" src="{% static 'bootstrap/jquery-3.5.1.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/popper.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap/bootstrap.min.js' %}"></script>
+</head>
+
+<body>
+    <div class="container">
+        <form action="{% url 'restaurant:gestionarPedido' %}" method="POST">
+            {% csrf_token %}
+            {% if seccion1 %}
+            <div class="seccionMenus">
+            {% else %}
+            <div class="seccionMenus visibleSection">
+            {% endif %}
+                <div class="card">
+                    <div class="card-header">
+                        <h1>Registrar Pedido-</h1>
+                    </div>
+                    <div class="card-body">
+                        <h4>NIT (opcional).-</h4>
+                        <button class="btn btn-dark" type="button" data-toggle="collapse" data-target="#nits"
+                            aria-expanded="false" aria-controls="nits">
+                            Nit
+                        </button> <br/><br/>
+                        <div class="collapse" id="nits">
+                            {% for n in nits %}
+                            <div class="form-check">
+                                <input type="radio" name="nit" id="{{n.nit_numero}}"
+                                    value="{{n.nit_numero}}" class="form-check-input">
+                                <label for="{{n.nit_numero}}" class="form-check-label">{{n.nit_dueno}}: {{n.nit_numero}}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <hr>
+                        <h4>Seleccione los platos del pedido</h4> <br />
+                        <button class="btn btn-dark" type="button" data-toggle="collapse" data-target="#menus"
+                            aria-expanded="false" aria-controls="menus">
+                            Menu
+                        </button> <br /><br />
+                        <div class="collapse" id="menus">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <h4>Menu</h4>
+                                </div>
+                                <div class="col-md-4">
+                                    <h4>Precio</h4>
+                                </div>
+                                <div class="col-md-4">
+                                    <h4>Cantidad en el pedido</h4>
+                                </div>
+                            </div>
+                            {% for m in menus %}
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input type="checkbox" name="{{m.men_nombre}}" id="{{m.men_id}}"
+                                            value="{{m.men_id}}" class="form-check-input">
+                                        <label for="{{m.men_id}}" class="form-check-label">{{m.men_nombre}}</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="">{{m.men_precio}}</label>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <input type="text" name="{{m.men_id}}C" placeholder="Cantidad del menu"
+                                            class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            {% endfor %}
+                        </div>
+                        <button class="btn btn-primary" name="siguiente">Siguiente</button>
+                    </div>
+                    <div class="card-footer">
+                        <label for="" style="color:red">{{msg}}</label>
+                    </div>
+                </div>
+            </div>
+
+            {% if seccion2 %}
+            <div class="confirmarSeccion">
+            {% else %}
+            <div class="confirmarSeccion visibleSection">
+            {% endif %}
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Confirmar pedido</h4>
+                    </div>
+                    <div class="card-body">
+                        <h4>Nit</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="text" value="{{elnit.nit_dueno}}" class="form-control" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="text" name="thenit" value="{{elnit.nit_numero}}" class="form-control" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <h4>Pedido.- </h4> <br/>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <h4>Menu</h4>
+                            </div>
+                            <div class="col-md-3">
+                                <h4>Precio</h4>
+                            </div>
+                            <div class="col-md-3">
+                                <h4>Cantidad</h4>
+                            </div>
+                            <div class="col-md-3">
+                                <h4>Subtotal</h4>
+                            </div>
+                        </div>
+                        {% for det in detallepedido %}
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" name="m{{det.menu.men_id}}" value="{{det.menu.men_nombre}}" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="">{{det.menu.men_precio}}</label>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" name="c{{det.menu.men_id}}" value="{{det.cantidad}}" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" name="s{{det.menu.men_id}}" value="{{det.subtot}}" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h4>Total</h4>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" name="totalp" value="{{total}}" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <h4>Tipo de pedido.-</h4>
+                        <div class="row">
+                            <div class="col-md-auto">
+                                <div class="form-check">
+                                    <input type="radio" name="tipop" id="mesa"
+                                        value="mesa" class="form-check-input" checked>
+                                    <label for="mesa" class="form-check-label">Mesa</label>
+                                </div>
+                            </div>
+                            <div class="col-md-auto">
+                                <div class="form-check">
+                                    <input type="radio" name="tipop" id="llevar"
+                                        value="llevar" class="form-check-input">
+                                    <label for="llevar" class="form-check-label">Llevar</label>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <button class="btn btn-success" name="confirmarpedido">Registrar pedido</button>
+                    </div>
+                    <div class="card-footer"></div>
+                </div>
+            </div>
+
+        </form>
+        <br /><br />
+        <a href="{% url 'restaurant:gestionarPedido' %}" class="btn btn-light">Volver a pedidos</a>
+        <br /><br />
+    </div>
+</body>
+
+</html>
