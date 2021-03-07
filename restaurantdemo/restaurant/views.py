@@ -1284,7 +1284,7 @@ def gest_menu_view(request):
                     msg = "Rellene los campos correctamente"
                     return render(request, 'restaurant/registrarMenu.html', {'categorias':categorias, 'msg':msg})
             else:
-                msg = "Seleccione un almacen"
+                msg = "Seleccione una Categoria"
                 return render(request, 'restaurant/registrarMenu.html', {'categorias':categorias, 'msg':msg})
         elif 'verBtn' in request.POST:
             men = MenuTb.objects.filter(men_id=request.POST['verBtn'])[0]
