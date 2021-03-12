@@ -1406,7 +1406,7 @@ def gest_pedido_view(request):
         else:
             return render(request, 'restaurant/errorPage.html')
     
-    if request.method == 'GET':
+    if request.method == 'GET': #Muestra los pedidos Activos
         pedidos = PedidoTb.objects.filter(ped_estado=1)
         return render(request, 'restaurant/gestionarPedidos.html', {'pedidos':pedidos})
     else:
@@ -1464,7 +1464,7 @@ def gest_pedido_view(request):
                     subtot = float(request.POST[subtotname])
                     nu_pm = Pedidoxmenu(pm_cantidad=cantidad, pm_subtotal=subtot, men=m, ped=nu_pedido)
                     nu_pm.save()
-
+            #Genera el Recibo
             thenit = NitTb.objects.filter(nit_numero=request.POST['thenit'])[0]
             nu_recibo = Recibo(rec_fecha=fecha, rec_hora=hora, rec_total=total, nit=thenit, ped=nu_pedido)
             nu_recibo.save()
@@ -1477,9 +1477,9 @@ def gest_pedido_view(request):
             if len(recib) > 0:
                 recib = recib[0]
             return render(request, 'restaurant/verPedido.html', {'pedido':pedido, 'detalle':detalle, 'recibo':recib})
-        elif 'seleccionarReporte' in request.POST:
+        elif 'seleccionarReporte' in request.POST: #1er boton ver Reporte
             return render(request, 'restaurant/seleccionarReporte.html')
-        elif 'verReporte' in request.POST:
+        elif 'verReporte' in request.POST: #2do boton ver reporte
             theyear = request.POST['yearR']
             themonth = request.POST['monthR']
             theday = request.POST['dayR']
@@ -1509,7 +1509,7 @@ def gest_pedido_view(request):
             request.session['lafecha'] = str(theyear) + '-' + str(themonth) + '-' + str(theday)
 
             return HttpResponseRedirect(reverse('restaurant:verReporte'))
-        elif 'imprimirRecibo' in request.POST:
+        elif 'imprimirRecibo' in request.POST: #Presiona en imprimir recibo
             request.session['pedrec'] = request.POST['imprimirRecibo']
             return HttpResponseRedirect(reverse('restaurant:repRecibo'))
 # ===========================
