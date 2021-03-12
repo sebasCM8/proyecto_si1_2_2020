@@ -522,7 +522,7 @@ def gest_bitacora(request):
         return render(request, 'restaurant/gestBitacora.html', {'bitacora':historial, 'acciones':acs, 'usuarios':usuarios, 'hay':hay})
     else:
         registros = None
-        if 'acc_id' in request.POST and request.POST['acc_id'] != "0":
+        if 'acc_id' in request.POST and request.POST['acc_id'] != "0": # ae verifica que se escoge una accion
             af_id = int(request.POST['acc_id'])
             af = AccionTb.objects.filter(acc_id=af_id)[0]
             registros = BitacoraTb.objects.filter(acc=af)
@@ -550,7 +550,7 @@ def gest_bitacora(request):
 
         hayregistros = True
         if len(historial) == 0: hayregistros = False
-
+    
         return render(request, 'restaurant/gestBitacora.html', {'bitacora':historial, 'acciones':acs, 'usuarios':usuarios, 'hay':hayregistros})
 
 # ======================
@@ -1477,3 +1477,86 @@ def gest_pedido_view(request):
             if len(recib) > 0:
                 recib = recib[0]
             return render(request, 'restaurant/verPedido.html', {'pedido':pedido, 'detalle':detalle, 'recibo':recib})
+        elif 'seleccionarReporte' in request.POST:
+            return render(request, 'restaurant/seleccionarReporte.html')
+        elif 'verReporte' in request.POST:
+            theyear = request.POST['yearR']
+            themonth = request.POST['monthR']
+            theday = request.POST['dayR']
+
+            msg = "Datos incorrectos.."
+            if es_natural(theyear):
+                theyear = int(theyear)
+                if not (theyear > 2000 and theyear <= 2021):
+                    msg = "El año es incorrecto"
+                    return render(request, 'restaurant/seleccionarReporte.html', {'msg':msg})
+            else: return render(request, 'restaurant/seleccionarReporte.html', {'msg':msg})
+
+            if es_natural(themonth):
+                themonth = int(themonth)
+                if not (themonth > 0 and themonth <= 12):
+                    msg = "El mes es incorrecto"
+                    return render(request, 'restaurant/seleccionarReporte.html', {'msg':msg})
+            else: return render(request, 'restaurant/seleccionarReporte.html', {'msg':msg})
+
+            if es_natural(theday):
+                theday = int(theday)
+                if not (theday > 0 and theday <= 28):
+                    msg = "El dia es incorrecto"
+                    return render(request, 'restaurant/seleccionarReporte.html', {'msg':msg})
+            else: return render(request, 'restaurant/seleccionarReporte.html', {'msg':msg})
+
+            request.session['lafecha'] = str(theyear) + '-' + str(themonth) + '-' + str(theday)
+
+            return HttpResponseRedirect(reverse('restaurant:verReporte'))
+        elif 'imprimirRecibo' in request.POST:
+            request.session['pedrec'] = request.POST['imprimirRecibo']
+            return HttpResponseRedirect(reverse('restaurant:repRecibo'))
+# ===========================
+# ==== CREATING THE REPORT ==
+# ===========================
+def render_to_pdf(template_src, context_dict={}):
+    template = get_template(template_src)
+    html  = template.render(context_dict)
+    result = BytesIO()
+    pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
+    if not pdf.err:
+        return HttpResponse(result.getvalue(), content_type='application/pdf')
+    return None
+
+def reporte_emps_view(request):
+    fecha = request.session['lafecha']
+    pedidos = PedidoTb.objects.filter(ped_estado=1, ped_fecha=fecha)
+    pedlista = list()
+    totalventas = 0
+    for ped in pedidos:
+        detalle = Pedidoxmenu.objects.filter(ped=ped)
+        datos = dict()
+        datos['ped'] = ped
+        datos['detalle'] = detalle
+        pedlista.append(datos)
+        totalventas += ped.ped_total
+
+    data = {
+        'totaldia':totalventas,
+        'pedidos':pedlista,
+        'fecha':fecha
+        }
+    pdf = render_to_pdf('restaurant/reporte.html', data)
+    return HttpResponse(pdf, content_type='application/pdf')
+# ===========================
+# ==== CREATING THE RECIBO ==
+# ===========================
+def reporte_recibo(request):
+    pedido = PedidoTb.objects.filter(ped_id=request.session['pedrec'])[0]
+    detalle = Pedidoxmenu.objects.filter(ped=pedido)
+    recib = Recibo.objects.filter(ped=pedido)
+    if len(recib) > 0:
+        recib = recib[0]
+    data = {
+        'pedido':pedido,
+        'detalle':detalle,
+        'recibo':recib
+        }
+    pdf = render_to_pdf('restaurant/imprecibo.html', data)
+    return HttpResponse(pdf, content_type='application/pdf')
