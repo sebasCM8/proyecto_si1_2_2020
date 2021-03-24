@@ -25,7 +25,7 @@ SECRET_KEY = 'i6()k+=h-17k!v2dmy92ddu2yn0^+25=&hxw1(*o#7=hsaaod#'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['sebastiancm.pythonanywhere.com']
 
 
 # Application definition
@@ -77,10 +77,10 @@ WSGI_APPLICATION = 'restaurantdemo.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'restaurante5_db',
-        'HOST':'localhost',
-        'USER': 'root',
-        'PASSWORD':'',
+        'NAME': 'sebastiancm$restaurante5_db',
+        'HOST':'sebastiancm.mysql.pythonanywhere-services.com',
+        'USER': 'sebastiancm',
+        'PASSWORD':'wserver2021',
         'PORT':'',
         'OPTIONS':{
             'init_command':"SET sql_mode='STRICT_TRANS_TABLES'"
@@ -114,7 +114,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/La_Paz'
 
 USE_I18N = True
 
@@ -127,3 +127,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATIC_ROOT = '/home/sebastiancm/proyecto_si1_2_2020/restaurantdemo/static'

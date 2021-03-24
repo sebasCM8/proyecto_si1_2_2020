@@ -3,8 +3,27 @@ from .models import EmpleadoTb, UsuarioTb, CargoTb, EmpleadoxcargoTb, ProveedorT
 import datetime
 import re
 
+from io import BytesIO # nos ayuda a convertir un html en pdf
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+
 # Create your views here.
 
+def es_decimal(cadena):
+    if '.' in cadena:
+        x = re.findall('^[0-9][0-9]*[.]{1}[0-9]*[1-9]+$', cadena)
+        if len(x)>0: return True
+        else: return False
+    else:
+        x = re.findall('^[1-9][0-9]*$', cadena)
+        if len(x)>0: return True
+        else: return False
+
+def es_natural(cadena):
+    x = re.findall('^[1-9][0-9]*$', cadena)
+    if len(x)>0: return True
+    else: return False
 
 def home_page(request):
     if 'userid' in request.session:
@@ -28,7 +47,7 @@ def registrar_empleados(request):
         ue = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0].emp
         if ue.es_admin() == False:
             return render(request, 'restaurant/errorPage.html')
-    else: 
+    else:
         return render(request, 'restaurant/errorPage.html')
 
     if request.method == 'GET':
@@ -44,19 +63,19 @@ def registrar_empleados(request):
         emp_sueldo= request.POST['emp_sueldo']
 
         cargos = CargoTb.objects.all()
-        tiene_cargo = False 
+        tiene_cargo = False
         for c in cargos:
-            if c.car_nombre in request.POST: 
+            if c.car_nombre in request.POST:
                 tiene_cargo = True
                 break
 
-        if (emp_nombre!="" and emp_sueldo.isnumeric() and emp_ap!="" and emp_am!="" and emp_ci.isnumeric() and emp_cel!="" and emp_dir!="" and tiene_cargo):
+        if (emp_nombre!="" and es_decimal(emp_sueldo) and emp_ap!="" and emp_am!="" and es_natural(emp_ci) and emp_cel!="" and emp_dir!="" and tiene_cargo):
             empleados = EmpleadoTb.objects.all()
             emp_ci = int(emp_ci)
-            emp_sueldo = int(emp_sueldo)
+            emp_sueldo = float(emp_sueldo)
             nuevo = True
             for emp in empleados:
-                if emp.emp_ci == emp_ci: 
+                if emp.emp_ci == emp_ci:
                     nuevo = False
                     break
             if nuevo:
@@ -65,7 +84,7 @@ def registrar_empleados(request):
 
                 fecha = datetime.date.today()
                 hora = datetime.datetime.now().time()
-                accion = AccionTb.objects.filter(acc_id=1)[0]
+                accion = AccionTb.objects.filter(acc_id=3)[0]
                 eluser = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0]
                 registrarAccion = BitacoraTb(bit_fecha=fecha, bit_hora=hora, usu=eluser, acc=accion)
                 registrarAccion.save()
@@ -89,7 +108,7 @@ def vista_empleados(request):
         ue = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0].emp
         if ue.es_admin() == False:
             return render(request, 'restaurant/errorPage.html')
-    else: 
+    else:
         return render(request, 'restaurant/errorPage.html')
 
     empleados = EmpleadoTb.objects.filter(emp_estado = 1)
@@ -102,7 +121,7 @@ def vista_empleados(request):
             tiene_usuario = False
             if len(usuario)>0:
                 usuario = usuario[0]
-                tiene_usuario = True                
+                tiene_usuario = True
 
             cargos = empleado.cargotb_set.all()
 
@@ -115,9 +134,9 @@ def vista_empleados(request):
             for c in cargos:
                 cargo_est = dict()
                 if c in exc:
-                    cargo_est['estado'] = True 
-                else: 
-                    cargo_est['estado'] = False 
+                    cargo_est['estado'] = True
+                else:
+                    cargo_est['estado'] = False
                 cargo_est['cargo'] = c
                 nu_cargos.append(cargo_est)
 
@@ -135,19 +154,19 @@ def eliminar_emp(request):
             emp.emp_estado = 0
             emp.save()
             return HttpResponseRedirect(reverse('restaurant:vistaemps'))
-    else: 
-        return render(request, 'restaurant/errorPage.html')        
+    else:
+        return render(request, 'restaurant/errorPage.html')
 
 def empleado_editado(request):
     if request.method=='POST':
         emp = EmpleadoTb.objects.filter(emp_ci = request.POST['emp_selected'])[0]
-        
+
         emp_sueldo = emp.emp_sueldo
         nuevo_sueldo = request.POST['sueldo']
-        if nuevo_sueldo.isnumeric() and nuevo_sueldo != emp_sueldo:
-            nuevo_sueldo = int(nuevo_sueldo)
+        if es_decimal(nuevo_sueldo) and nuevo_sueldo != emp_sueldo:
+            nuevo_sueldo = float(nuevo_sueldo)
             if nuevo_sueldo >= 0:
-                emp.emp_sueldo = nuevo_sueldo            
+                emp.emp_sueldo = nuevo_sueldo
                 emp.save()
 
         emp_cargos = emp.cargotb_set.all()
@@ -163,7 +182,7 @@ def empleado_editado(request):
                     cargo_antiguo.delete()
 
         return render(request, 'restaurant/guardar_cambios_emp.html', {'empleado':emp})
-    else: 
+    else:
         return render(request, 'restaurant/errorPage.html')
 # =====================
 # GESTIONAR USUARIO
@@ -173,7 +192,7 @@ def registrar_usuario(request):
         ue = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0].emp
         if ue.es_admin() == False:
             return render(request, 'restaurant/errorPage.html')
-    else: 
+    else:
         return render(request, 'restaurant/errorPage.html')
 
     empleados = EmpleadoTb.objects.filter(emp_estado=1)
@@ -192,7 +211,7 @@ def registrar_usuario(request):
     else:
         usu_nombre = request.POST['usu_nombre']
         usu_contra = request.POST['usu_contra']
-        
+
         if usu_contra != "" and usu_nombre != "" and 'emp_id' in request.POST:
 
             usuarios_mismoUsername = UsuarioTb.objects.filter(usu_nombre = usu_nombre)
@@ -226,13 +245,13 @@ def perfil_view(request):
             usuario = UsuarioTb.objects.filter(usu_id = request.POST['editar'])[0]
             empleado = usuario.emp
             return render(request, 'restaurant/editarPerfil.html', {'user': usuario, 'empleado': empleado})
-        
+
         if 'cancelar' in request.POST:
             usuario = UsuarioTb.objects.filter(usu_id = request.POST['cancelar'])[0]
             empleado = usuario.emp
             cargos = empleado.cargotb_set.all()
             return render(request, 'restaurant/perfil.html', {'user':usuario, 'empleado':empleado, 'cargos':cargos})
-        
+
         if 'guardar' in request.POST:
             user_nombre = request.POST['usu_nombre']
             user_contra = request.POST['usu_contra']
@@ -251,7 +270,7 @@ def perfil_view(request):
             if user_contra != "" and user_contra != usuario.usu_contra:
                 usuario.usu_contra = user_contra
                 usuario.save()
-            
+
             empleado = usuario.emp
             if emp_nombre != "" and emp_nombre != empleado.emp_nombre:
                 empleado.emp_nombre = emp_nombre
@@ -268,8 +287,8 @@ def perfil_view(request):
             if emp_direccion != "" and emp_direccion != empleado.emp_direccion:
                 empleado.emp_direccion = emp_direccion
                 empleado.save()
-            
-            cargos = empleado.cargotb_set.all() 
+
+            cargos = empleado.cargotb_set.all()
 
             return render(request, 'restaurant/perfil.html', {'user':usuario, 'empleado':empleado, 'cargos':cargos})
     else:
@@ -302,14 +321,14 @@ def registrar_cargo(request):
             return render(request, 'restaurant/cargo_form.html', {'msg':msg, 'gm':good_msg})
         else:
             msg = "Rellene todos los campos para registrar"
-            good_msg = False 
+            good_msg = False
         return render(request, 'restaurant/cargo_form.html', {'msg':msg, 'gm':good_msg})
     elif request.method == 'GET':
         if 'userid' in request.session:
             ue = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0].emp
             if ue.es_admin() == False:
                 return render(request, 'restaurant/errorPage.html')
-        else: 
+        else:
             return render(request, 'restaurant/errorPage.html')
 
         return render(request, 'restaurant/cargo_form.html')
@@ -320,7 +339,7 @@ def vista_cargos(request):
             ue = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0].emp
             if ue.es_admin() == False:
                 return render(request, 'restaurant/errorPage.html')
-        else: 
+        else:
             return render(request, 'restaurant/errorPage.html')
 
         cargos = CargoTb.objects.all()
@@ -340,10 +359,10 @@ def editar_cargo(request):
         cargo = CargoTb.objects.filter(car_id=request.POST['guardar'])[0]
         if car_nombre != "" and car_desc != "" and (car_nombre != cargo.car_nombre or car_desc != cargo.car_desc):
             cargo.car_nombre = car_nombre
-            cargo.car_desc = car_desc 
+            cargo.car_desc = car_desc
             cargo.save()
         return HttpResponseRedirect(reverse('restaurant:vercargos'))
-    else: 
+    else:
         return render(request, 'restaurant/errorPage.html')
 
 def eliminar_cargo(request):
@@ -352,15 +371,15 @@ def eliminar_cargo(request):
             cargo = CargoTb.objects.filter(car_id=request.POST['eliminar'])[0]
 
             cargo.puestos.clear()
-            
+
             cargo.delete()
             return HttpResponseRedirect(reverse('restaurant:vercargos'))
         elif 'cancelar' in request.POST:
             return HttpResponseRedirect(reverse('restaurant:vercargos'))
-    else: 
+    else:
         return render(request, 'restaurant/errorPage.html')
 # ======================
-# == GESTIONAR LOGIN === 
+# == GESTIONAR LOGIN ===
 # ======================
 def login_view(request):
     if request.method == 'GET':
@@ -379,7 +398,7 @@ def login_view(request):
 
                         fecha = datetime.date.today()
                         hora = datetime.datetime.now().time()
-                        accion = AccionTb.objects.filter(acc_id=5)[0]
+                        accion = AccionTb.objects.filter(acc_id=1)[0]
                         registrarAccion = BitacoraTb(bit_fecha=fecha, bit_hora=hora, usu=eluser, acc=accion)
                         registrarAccion.save()
 
@@ -387,10 +406,10 @@ def login_view(request):
                     else:
                         msg = "Usuario no valido"
                         return render(request, 'restaurant/login.html', {'msg':msg, 'msgcolor':'red'})
-                    
+
                 else:
                     msg = "Contraseña incorrecta"
-                    return render(request, 'restaurant/login.html', {'msg':msg, 'msgcolor':'red'})    
+                    return render(request, 'restaurant/login.html', {'msg':msg, 'msgcolor':'red'})
             else:
                 msg = "El usuario {} no esta registrado..".format(usu_nombre)
                 return render(request, 'restaurant/login.html', {'msg':msg, 'msgcolor':'red'})
@@ -398,17 +417,17 @@ def login_view(request):
             msg = "Rellene todos los campos para ingresar"
             return render(request, 'restaurant/login.html', {'msg':msg, 'msgcolor':'red'})
 # ======================
-# == GESTIONAR LOGOUT === 
+# == GESTIONAR LOGOUT ===
 # ======================
 def logoutAction(request):
     if 'userid' in request.session:
         eluser = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0]
         fecha = datetime.date.today()
         hora = datetime.datetime.now().time()
-        accion = AccionTb.objects.filter(acc_id=6)[0]
+        accion = AccionTb.objects.filter(acc_id=2)[0]
         registrarAccion = BitacoraTb(bit_fecha=fecha, bit_hora=hora, usu=eluser, acc=accion)
         registrarAccion.save()
-        
+
         request.session.flush()
 
         return HttpResponseRedirect(reverse('restaurant:login'))
@@ -423,7 +442,7 @@ def gestionar_proveedor_vista(request):
             ue = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0].emp
             if ue.es_admin() == False:
                 return render(request, 'restaurant/errorPage.html')
-        else: 
+        else:
             return render(request, 'restaurant/errorPage.html')
 
         proveedores = ProveedorTb.objects.all()
@@ -435,17 +454,17 @@ def gestionar_proveedor_vista(request):
             prov_nombre = request.POST['pro_nombre']
             prov_celular = request.POST['pro_celular']
             prov_direccion = request.POST['pro_direccion']
-            if prov_nombre!="" and prov_celular.isnumeric() and prov_direccion!="":
+            if prov_nombre!="" and es_natural(prov_celular) and prov_direccion!="":
                 nuevoProveedor = ProveedorTb(pro_nombre=prov_nombre, pro_direccion=prov_direccion, pro_celular=prov_celular)
                 nuevoProveedor.save()
                 msg = "Proveedor registrado exitosamente.."
 
                 fecha = datetime.date.today()
                 hora = datetime.datetime.now().time()
-                accion = AccionTb.objects.filter(acc_id=3)[0]
+                accion = AccionTb.objects.filter(acc_id=5)[0]
                 eluser = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0]
                 registrarAccion = BitacoraTb(bit_fecha=fecha, bit_hora=hora, usu=eluser, acc=accion)
-                registrarAccion.save()                    
+                registrarAccion.save()
 
                 return render(request, 'restaurant/registrarProveedor.html', {'msg':msg, 'exito':True})
             msg = "Rellene todos los campos correctamente para registrar al proveedor..."
@@ -458,7 +477,7 @@ def gestionar_proveedor_vista(request):
             nu_nombre = request.POST['pro_nombre']
             nu_direccion = request.POST['pro_direccion']
             nu_celular = request.POST['pro_celular']
-            if nu_celular.isnumeric() and nu_celular != p.pro_celular:
+            if es_natural(nu_celular) and nu_celular != p.pro_celular:
                 p.pro_celular = nu_celular
                 p.save()
             if nu_nombre != "" and nu_nombre != p.pro_nombre:
@@ -490,11 +509,11 @@ def gest_accion_view(request):
             ue = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0].emp
             if ue.es_admin() == False:
                 return render(request, 'restaurant/errorPage.html')
-        else: 
+        else:
             return render(request, 'restaurant/errorPage.html')
 
         acciones = AccionTb.objects.all()
-        return render(request, 'restaurant/gestionarAccion.html', {'acciones':acciones})    
+        return render(request, 'restaurant/gestionarAccion.html', {'acciones':acciones})
 #========================
 #== GESTIONAR BITACORA ==
 #========================
@@ -504,7 +523,7 @@ def gest_bitacora(request):
             ue = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0].emp
             if ue.es_admin() == False:
                 return render(request, 'restaurant/errorPage.html')
-        else: 
+        else:
             return render(request, 'restaurant/errorPage.html')
 
         bitacora = BitacoraTb.objects.all()
@@ -514,7 +533,7 @@ def gest_bitacora(request):
             record['usuario'] = b.usu.usu_nombre
             record['accion'] = b.acc.acc_nombre
             record['fecha'] = b.bit_fecha
-            record['hora'] = b.bit_hora  
+            record['hora'] = b.bit_hora
             historial.append(record)
         acs = AccionTb.objects.all()
         usuarios = UsuarioTb.objects.all()
@@ -528,7 +547,7 @@ def gest_bitacora(request):
             registros = BitacoraTb.objects.filter(acc=af)
         else:
             registros = BitacoraTb.objects.all()
-        
+
         if 'usu_nombre' in request.POST and request.POST['usu_nombre'] != "todos":
             unombre = request.POST['usu_nombre']
             registros_finales = list()
@@ -543,7 +562,7 @@ def gest_bitacora(request):
             record['usuario'] = b.usu.usu_nombre
             record['accion'] = b.acc.acc_nombre
             record['fecha'] = b.bit_fecha
-            record['hora'] = b.bit_hora  
+            record['hora'] = b.bit_hora
             historial.append(record)
         acs = AccionTb.objects.all()
         usuarios = UsuarioTb.objects.all()
@@ -566,7 +585,7 @@ def gest_nit_view(request):
             return render(request, 'restaurant/errorPage.html')
 
     if request.method == 'GET':
-        nits = NitTb.objects.all() 
+        nits = NitTb.objects.all()
         return render(request, 'restaurant/gestionarNit.html', {'nits':nits})
     else:
         if 'registrarBtn' in request.POST:
@@ -574,7 +593,7 @@ def gest_nit_view(request):
         elif 'registrarNit' in request.POST:
             nit_nro = request.POST['nit_numero']
             nit_nombre = request.POST['nit_nombre']
-            if nit_nro.isnumeric() and nit_nombre != "":
+            if es_natural(nit_nro) and nit_nombre != "":
                 nit_nro = int(nit_nro)
                 nitdoble_num = NitTb.objects.filter(nit_numero=nit_nro)
                 nitdoble_nom = NitTb.objects.filter(nit_dueno=nit_nombre)
@@ -589,15 +608,15 @@ def gest_nit_view(request):
                     registrarAccion.save()
                     msg = "Nit registrado.."
                     goodmsg = True
-                    return render(request, 'restaurant/registrarNit.html', {'msg':msg, 'e':goodmsg})            
+                    return render(request, 'restaurant/registrarNit.html', {'msg':msg, 'e':goodmsg})
                 else:
                     msg = "El numero de nit ya esta registrado.."
                     goodmsg = False
-                    return render(request, 'restaurant/registrarNit.html', {'msg':msg, 'e':goodmsg})            
+                    return render(request, 'restaurant/registrarNit.html', {'msg':msg, 'e':goodmsg})
             else:
                 msg = "Rellene todos los campos correctamente.."
                 goodmsg = False
-                return render(request, 'restaurant/registrarNit.html', {'msg':msg, 'e':goodmsg})            
+                return render(request, 'restaurant/registrarNit.html', {'msg':msg, 'e':goodmsg})
         elif 'editarBtn' in request.POST:
             nit = NitTb.objects.filter(nit_id=request.POST['editarBtn'])[0]
             return render(request, 'restaurant/editarNit.html', {'n':nit})
@@ -609,7 +628,7 @@ def gest_nit_view(request):
             if nu_nombre != "" and nu_nombre != elnit.nit_dueno:
                 elnit.nit_dueno = nu_nombre
                 elnit.save()
-            if nu_numero.isnumeric():
+            if es_natural(nu_numero):
                 nu_numero = int(nu_numero)
                 if nu_numero != elnit.nit_numero:
                     elnit.nit_numero = nu_numero
@@ -626,7 +645,7 @@ def gest_producto_view(request):
                 return render(request, 'restaurant/errorPage.html')
         else:
             return render(request, 'restaurant/errorPage.html')
-        
+
     if request.method == 'GET':
         productos = ProductoTb.objects.all()
         return render(request, 'restaurant/gestionarProducto.html',{'productos':productos})
@@ -637,11 +656,12 @@ def gest_producto_view(request):
             pnombre = request.POST['prod_nombre']
             pduracion = request.POST['prod_duracion']
 
-            if pduracion.isnumeric() and pnombre != "":
+            if es_natural(pduracion) and pnombre != "":
                 esrepetido = ProductoTb.objects.filter(prod_nombre=pnombre)
                 if len(esrepetido) > 0:
                     msg= "Producto ya registrado"
                     return render(request, 'restaurant/registrarProducto.html', {'msg':msg, 'e':False})
+                pduracion = int(pduracion)
                 nuevo_producto = ProductoTb(prod_nombre=pnombre, prod_duracion=pduracion)
                 nuevo_producto.save()
                 msg= "Producto registrado exitosamente.."
@@ -651,7 +671,7 @@ def gest_producto_view(request):
                 accion = AccionTb.objects.filter(acc_id=8)[0]
                 eluser = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0]
                 registrarAccion = BitacoraTb(bit_fecha=fecha, bit_hora=hora, usu=eluser, acc=accion)
-                registrarAccion.save()    
+                registrarAccion.save()
 
                 return render(request, 'restaurant/registrarProducto.html', {'msg':msg, 'e':True})
             else:
@@ -667,7 +687,8 @@ def gest_producto_view(request):
             if pnombre!="" and pnombre!=elprod.prod_nombre:
                 elprod.prod_nombre = pnombre
                 elprod.save()
-            if pduracion.isnumeric() and pduracion!=elprod.prod_duracion:
+            if es_natural(pduracion) and pduracion!=elprod.prod_duracion:
+                pduracion = int(pduracion)
                 elprod.prod_duracion = pduracion
                 elprod.save()
             return HttpResponseRedirect(reverse('restaurant:gestionarProducto'))
@@ -708,7 +729,7 @@ def gest_nota_compra_view(request):
                 return render(request, 'restaurant/errorPage.html')
         else:
             return render(request, 'restaurant/errorPage.html')
-    
+
     if request.method == 'GET':
         ncompras = NotacompraTb.objects.all()
         return render(request, 'restaurant/gestionarNC.html', {'ncompras':ncompras})
@@ -717,14 +738,14 @@ def gest_nota_compra_view(request):
             productos = ProductoTb.objects.all()
             proveedores = ProveedorTb.objects.all()
             return render(request, 'restaurant/registrarNC.html', {'productos':productos, 'proveedores':proveedores, 'seccion1':True})
-        elif 'registrarBtn2' in request.POST: 
+        elif 'registrarBtn2' in request.POST:
             productos = ProductoTb.objects.all()
             proveedores = ProveedorTb.objects.all()
             plista = list()
             for p in productos:
                 if p.prod_nombre in request.POST:
                     plista.append(p)
-            
+
             if len(plista)>0 and 'pro_id' in request.POST:
                 proveedor = ProveedorTb.objects.filter(pro_id=request.POST['pro_id'])[0]
                 return render(request, 'restaurant/registrarNC.html', {'plista':plista, 'proveedor':proveedor, 'seccion2':True})
@@ -746,12 +767,12 @@ def gest_nota_compra_view(request):
                 pdatos['prod']=p
                 cantidad_name=p.prod_nombre+"C"
                 pdatos['cantidad']=request.POST[cantidad_name]
-                if not pdatos['cantidad'].isnumeric():
+                if not es_natural(pdatos['cantidad']):
                     msg = "Rellene correctamente los campos para continuar"
                     return render(request, 'restaurant/registrarNC.html', {'plista':plista, 'proveedor':proveedor, 'seccion2':True, 'msg':msg})
                 precio_name = p.prod_nombre+"P"
                 pdatos['precio']=request.POST[precio_name]
-                if not pdatos['precio'].isnumeric():
+                if not es_decimal(pdatos['precio']):
                     msg = "Rellene correctamente los campos para continuar"
                     return render(request, 'restaurant/registrarNC.html', {'plista':plista, 'proveedor':proveedor, 'seccion2':True, 'msg':msg})
                 pu=float(pdatos['precio'])*float(pdatos['cantidad'])
@@ -829,7 +850,7 @@ def gest_nota_entrada_view(request):
                 return render(request, 'restaurant/errorPage.html')
         else:
             return render(request, 'restaurant/errorPage.html')
-    
+
     if request.method == 'GET':
         notas = NotaentradaTb.objects.all()
         return render(request, 'restaurant/gestionarNE.html', {'notase':notas})
@@ -858,7 +879,7 @@ def gest_nota_entrada_view(request):
                 datos['prod'] = prd
                 cantidadname = prd.prod_nombre+"C"
                 cantidad = request.POST[cantidadname]
-                if not cantidad.isnumeric():
+                if not es_natural(cantidad):
                     return render(request, 'restaurant/registrarNE.html', {'seccion2':True, 'msg':"Introduzca las cantidades correcatmente", 'plista':plista})
                 datos['cantidad']=int(cantidad)
                 pdatos.append(datos)
@@ -917,7 +938,7 @@ def gest_almacen(request):
                 return render(request, 'restaurant/errorPage.html')
         else:
             return render(request, 'restaurant/errorPage.html')
-        
+
     if request.method == 'GET':
         almacenes = AlmacenTb.objects.all()
         return render(request, 'restaurant/gestionarAlmacen.html', {'almacenes':almacenes})
@@ -991,7 +1012,7 @@ def gest_lote_view(request):
                 return render(request, 'restaurant/errorPage.html')
         else:
             return render(request, 'restaurant/errorPage.html')
-    
+
     if request.method == 'GET':
         lotes = LoteTb.objects.filter(lot_estado=1)
         return render(request, 'restaurant/gestionarLotes.html', {'lotes':lotes})
@@ -1002,7 +1023,7 @@ def gest_lote_view(request):
             return render(request, 'restaurant/registrarLote.html', {'entradas':elista, 'almacenes':almacenes})
         elif 'registrarLote' in request.POST:
             lote_canti = request.POST['lote_canti']
-            if 'alm_nombre' in request.POST and 'nep_id' in request.POST and lote_canti.isnumeric():
+            if 'alm_nombre' in request.POST and 'nep_id' in request.POST and es_natural(lote_canti):
                 almacen = AlmacenTb.objects.filter(alm_id=request.POST['alm_nombre'])[0]
                 nep = NentradaxproductoTb.objects.filter(nep_id=request.POST['nep_id'])[0]
                 lotecanti = int(lote_canti)
@@ -1023,7 +1044,7 @@ def gest_lote_view(request):
                     elista = obtener_entradas()
                     almacenes = AlmacenTb.objects.all()
                     msg = "La cantidad no debe ser mayor al saldo en la entrada"
-                    return render(request, 'restaurant/registrarLote.html', {'entradas':elista, 'almacenes':almacenes, 'msg':msg}) 
+                    return render(request, 'restaurant/registrarLote.html', {'entradas':elista, 'almacenes':almacenes, 'msg':msg})
             else:
                 elista = obtener_entradas()
                 almacenes = AlmacenTb.objects.all()
@@ -1096,7 +1117,7 @@ def obtener_almacend(alm):
     stock_list = list()
     for dkey in prods_cants:
         stock_list.append(prods_cants[dkey])
-    return stock_list    
+    return stock_list
 
 def gest_ns_view(request):
     if request.method == 'GET':
@@ -1106,7 +1127,7 @@ def gest_ns_view(request):
                 return render(request, 'restaurant/errorPage.html')
         else:
             return render(request, 'restaurant/errorPage.html')
-    
+
     if request.method == 'GET':
         notas = NotasalidaTb.objects.filter(nots_estado = 1)
         return render(request, 'restaurant/gestionarNS.html', {'notass':notas})
@@ -1135,7 +1156,7 @@ def gest_ns_view(request):
                     datos['stock'] = int(request.POST[sname])
                     cname = p.prod_nombre + 'C'
                     cantidad = request.POST[cname]
-                    if cantidad.isnumeric() and int(cantidad)<=datos['stock']:
+                    if es_natural(cantidad) and int(cantidad)<=datos['stock']:
                         datos['cantidad'] = int(cantidad)
                     else:
                         astock = obtener_almacend(almacen)
@@ -1157,7 +1178,7 @@ def gest_ns_view(request):
                             numov.save()
                             saldo = 0
                             if obtener_lote_cant(l) == 0:
-                                l.lot_estado = 0 
+                                l.lot_estado = 0
                                 l.save()
                             nu_detalla_nsp = NsalidaxproductoTb(nsp_cantidad=det['cantidad'], prod=l.prod, nots=nu_ns)
                             nu_detalla_nsp.save()
@@ -1166,7 +1187,7 @@ def gest_ns_view(request):
                             saldo -= lsaldo
                             numov = MovimientoloteTb(lot=l, cant=-lsaldo)
                             numov.save()
-                            l.lot_estado = 0 
+                            l.lot_estado = 0
                             l.save()
                 registrarAccion(15, eluser)
 
@@ -1183,7 +1204,7 @@ def gest_ns_view(request):
             else:
                 astock = obtener_almacend(almacen)
                 msg = "Seleccione almenos un producto para registrar la nota de salida a produccion"
-                return render(request, 'restaurant/registrarNS.html', {'almacen':almacen, 'stock':astock, 'seccion2':True, 'msg':msg})                
+                return render(request, 'restaurant/registrarNS.html', {'almacen':almacen, 'stock':astock, 'seccion2':True, 'msg':msg})
         elif 'verBtn' in request.POST:
             ns = NotasalidaTb.objects.filter(nots_id=request.POST['verBtn'])[0]
             stock = StockVenta.objects.filter(ns=ns)
@@ -1226,7 +1247,7 @@ def gest_categoria_view(request):
                     return render(request, 'restaurant/registrarCategoria.html', {'msg':msg})
                 nu_cat = CategoriaTb(cat_nombre=cat_nombre, cat_estado=1)
                 nu_cat.save()
-                
+
                 user = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0]
                 registrarAccion(16, user)
 
@@ -1248,21 +1269,6 @@ def gest_categoria_view(request):
 # =================================
 # == GESTIONAR MENU =====
 # ================================
-def es_decimal(cadena):
-    if '.' in cadena:
-        x = re.findall('^[0-9][0-9]*[.]{1}[0-9]*[1-9]+$', cadena)
-        if len(x)>0: return True
-        else: return False
-    else:
-        x = re.findall('^[1-9][0-9]*$', cadena)
-        if len(x)>0: return True
-        else: return False
-
-def es_natural(cadena):
-    x = re.findall('^[1-9][0-9]*$', cadena)
-    if len(x)>0: return True
-    else: return False
-
 def gest_menu_view(request):
     if request.method == 'GET':
         if 'userid' in request.session:
@@ -1271,7 +1277,7 @@ def gest_menu_view(request):
                 return render(request, 'restaurant/errorPage.html')
         else:
             return render(request, 'restaurant/errorPage.html')
-    
+
     if request.method == 'GET':
         menus = MenuTb.objects.filter(men_estado=1)
         return render(request, 'restaurant/gestionarMenu.html', {'menus':menus})
@@ -1297,7 +1303,7 @@ def gest_menu_view(request):
 
                     user = UsuarioTb.objects.filter(usu_id=request.session['userid'])[0]
                     registrarAccion(17, user)
-                    
+
                     msg = "Menu registrado con exito.."
                     return render(request, 'restaurant/registrarMenu.html', {'categorias':categorias, 'msg':msg, 'ok':True})
                 else:
@@ -1356,7 +1362,7 @@ def gest_racion_view(request):
                 return render(request, 'restaurant/errorPage.html')
         else:
             return render(request, 'restaurant/errorPage.html')
-    
+
     if request.method == 'GET':
         raciones = ConversionVenta.objects.all()
         return render(request, 'restaurant/gestConversion.html', {'conversiones':raciones})
@@ -1369,7 +1375,7 @@ def gest_racion_view(request):
             if 'prd' in request.POST:
                 producto = ProductoTb.objects.filter(prod_id=request.POST['prd'])[0]
                 cantidad = request.POST['cv_cantidad']
-                if cantidad.isnumeric():
+                if es_natural(cantidad):
                     cantidad = int(cantidad)
                     nu_racion = ConversionVenta(cv_cantidad=cantidad, prod=producto)
                     nu_racion.save()
@@ -1388,7 +1394,7 @@ def gest_racion_view(request):
         elif 'editarCon' in request.POST:
             racion = ConversionVenta.objects.filter(cv_id=request.POST['editarCon'])[0]
             nu_cantidad = request.POST['cv_cantidad']
-            if nu_cantidad.isnumeric():
+            if es_natural(nu_cantidad):
                 nu_cantidad = int(nu_cantidad)
                 if nu_cantidad != racion.cv_cantidad and nu_cantidad > 0:
                     racion.cv_cantidad = nu_cantidad
@@ -1405,7 +1411,7 @@ def gest_pedido_view(request):
                 return render(request, 'restaurant/errorPage.html')
         else:
             return render(request, 'restaurant/errorPage.html')
-    
+
     if request.method == 'GET':
         pedidos = PedidoTb.objects.filter(ped_estado=1)
         return render(request, 'restaurant/gestionarPedidos.html', {'pedidos':pedidos})
@@ -1477,3 +1483,86 @@ def gest_pedido_view(request):
             if len(recib) > 0:
                 recib = recib[0]
             return render(request, 'restaurant/verPedido.html', {'pedido':pedido, 'detalle':detalle, 'recibo':recib})
+        elif 'seleccionarReporte' in request.POST:
+            return render(request, 'restaurant/seleccionarReporte.html')
+        elif 'verReporte' in request.POST:
+            theyear = request.POST['yearR']
+            themonth = request.POST['monthR']
+            theday = request.POST['dayR']
+
+            msg = "Datos incorrectos.."
+            if es_natural(theyear):
+                theyear = int(theyear)
+                if not (theyear > 2000 and theyear <= 2021):
+                    msg = "El año es incorrecto"
+                    return render(request, 'restaurant/seleccionarReporte.html', {'msg':msg})
+            else: return render(request, 'restaurant/seleccionarReporte.html', {'msg':msg})
+
+            if es_natural(themonth):
+                themonth = int(themonth)
+                if not (themonth > 0 and themonth <= 12):
+                    msg = "El mes es incorrecto"
+                    return render(request, 'restaurant/seleccionarReporte.html', {'msg':msg})
+            else: return render(request, 'restaurant/seleccionarReporte.html', {'msg':msg})
+
+            if es_natural(theday):
+                theday = int(theday)
+                if not (theday > 0 and theday <= 28):
+                    msg = "El dia es incorrecto"
+                    return render(request, 'restaurant/seleccionarReporte.html', {'msg':msg})
+            else: return render(request, 'restaurant/seleccionarReporte.html', {'msg':msg})
+
+            request.session['lafecha'] = str(theyear) + '-' + str(themonth) + '-' + str(theday)
+
+            return HttpResponseRedirect(reverse('restaurant:verReporte'))
+        elif 'imprimirRecibo' in request.POST:
+            request.session['pedrec'] = request.POST['imprimirRecibo']
+            return HttpResponseRedirect(reverse('restaurant:repRecibo'))
+# ===========================
+# ==== CREATING THE REPORT ==
+# ===========================
+def render_to_pdf(template_src, context_dict={}):
+    template = get_template(template_src)
+    html  = template.render(context_dict)
+    result = BytesIO()
+    pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
+    if not pdf.err:
+        return HttpResponse(result.getvalue(), content_type='application/pdf')
+    return None
+
+def reporte_emps_view(request):
+    fecha = request.session['lafecha']
+    pedidos = PedidoTb.objects.filter(ped_estado=1, ped_fecha=fecha)
+    pedlista = list()
+    totalventas = 0
+    for ped in pedidos:
+        detalle = Pedidoxmenu.objects.filter(ped=ped)
+        datos = dict()
+        datos['ped'] = ped
+        datos['detalle'] = detalle
+        pedlista.append(datos)
+        totalventas += ped.ped_total
+
+    data = {
+        'totaldia':totalventas,
+        'pedidos':pedlista,
+        'fecha':fecha
+        }
+    pdf = render_to_pdf('restaurant/reporte.html', data)
+    return HttpResponse(pdf, content_type='application/pdf')
+# ===========================
+# ==== CREATING THE RECIBO ==
+# ===========================
+def reporte_recibo(request):
+    pedido = PedidoTb.objects.filter(ped_id=request.session['pedrec'])[0]
+    detalle = Pedidoxmenu.objects.filter(ped=pedido)
+    recib = Recibo.objects.filter(ped=pedido)
+    if len(recib) > 0:
+        recib = recib[0]
+    data = {
+        'pedido':pedido,
+        'detalle':detalle,
+        'recibo':recib
+        }
+    pdf = render_to_pdf('restaurant/imprecibo.html', data)
+    return HttpResponse(pdf, content_type='application/pdf')

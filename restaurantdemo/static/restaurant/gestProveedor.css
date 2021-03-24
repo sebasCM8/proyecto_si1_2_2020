@@ -1,0 +1,25 @@
+body{
+    background-color: #d9d9d9;
+}
+
+.proveedoresHeader{
+    background-color:  #bfbfbf;
+    border-radius: 1em;
+    padding: 20px;
+    width: 80%;
+    margin: 20px 0;
+}
+
+.agregarLabel{
+    color: blue;
+}
+
+.regProvCard{
+    width: 70%;
+    margin: auto;
+}
+
+.proveedoresBody{
+    padding: 15px;
+    background-color: #f2f2f2;
+}

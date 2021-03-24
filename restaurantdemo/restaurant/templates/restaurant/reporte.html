@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+<style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+</style>
+</head>
+<body>
+    <div class="container">
+        <h2>Informe de pedidos: {{fecha}}</h2>
+        <hr>
+        {% for p in pedidos %}
+        <h4>Pedido: {{p.ped.ped_id}}</h4>
+        <table>
+            <tr>
+                <th><h4>Menu</h4></th>
+                <th><h4>Precio</h4></th>
+                <th><h4>Cantidad</h4></th>
+                <th><h4>Subtotal</h4></th>
+            </tr>
+                {% for d in p.detalle%}
+                <tr>
+                    <td>
+                        <label>{{d.men.men_nombre}}</label>
+                    </td>
+                    <td>
+                        <label>{{d.men.men_precio}}</label>
+                    </td>
+                    <td>
+                        <label>{{d.pm_cantidad}}</label>
+                    </td>
+                    <td>
+                        <label>{{d.pm_subtotal}}</label>
+                    </td>
+                </tr>
+                {% endfor %}
+            <tr>
+                <td>
+                    <h4>Total pedido:</h4>
+                </td>
+                <td>
+                    <label>{{p.ped.ped_total}}</label>
+               </td>
+            </tr>
+        </table>
+        {% endfor %}
+        <h4>Total ventas del dia: {{totaldia}}</h4>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,40 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seleccionar reporte</title>
+
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'restaurant/gestionarPedido.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                    <form action="{% url 'restaurant:gestionarPedido' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <input type="text" name="yearR" placeholder="año" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" name="monthR" placeholder="mes" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" name="dayR" placeholder="dia" class="form-control">
+                    </div>
+                    <button class="btn btn-primary" name="verReporte">Ver reporte</button>
+                </form>
+
+                <label style="color:red">{{msg}}</label>
+
+            </div>
+        </div>
+        <br /><br />
+        <a href="{% url 'restaurant:gestionarPedido' %}" class="btn btn-light">Volver a pedidos</a>
+        <br /><br />
+    </div>
+</body>
+</html>

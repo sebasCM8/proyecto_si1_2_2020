@@ -81,6 +81,10 @@
                 <a href="{% url 'restaurant:gestionarPedido' %}" class="btn btn-dark">Volver a pedidos</a>
             </div>
         </div>
+        <form action="{% url 'restaurant:gestionarPedido' %}" method="POST">
+            {% csrf_token %}
+            <button name="imprimirRecibo" class="btn btn-primary" value="{{pedido.ped_id}}">Imprimir recibo</button>
+        </form>
     </div>
 </body>
 </html>

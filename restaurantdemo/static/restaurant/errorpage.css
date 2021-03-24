@@ -1,0 +1,15 @@
+body{
+    background-color: #F7F7F7;
+}
+
+.errorHeader{
+    margin-top: 50px;
+    text-align: center;
+}
+
+.errorimg{
+    position: relative;
+    left: 25%;
+    margin: auto;
+    max-width: 50%;
+}

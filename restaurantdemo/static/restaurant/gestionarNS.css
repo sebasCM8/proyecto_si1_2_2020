@@ -1,0 +1,38 @@
+body{
+    background-color: #595959;
+}
+
+
+.gnsHeader{
+    margin-top: 30px;
+    background-color: #808080;
+    padding: 20px;
+    color: #e6e6e6;
+    margin-bottom: 50px;
+    border-radius: 2%;
+}
+
+.almacenSection{
+    margin-top: 50px;
+    background-color: #d9d9d9;
+    padding: 20px;
+}
+
+.gnsBody{
+    margin-top: 50px;
+    background-color: #d9d9d9;
+    padding: 20px;
+}
+.regHeader{
+    color: white;
+}
+
+.stockSection{
+    margin-top: 50px;
+    background-color: #d9d9d9;
+    padding: 20px;
+}
+
+.visibleSection{
+    visibility: hidden;
+}

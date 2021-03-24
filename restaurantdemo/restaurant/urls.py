@@ -1,4 +1,4 @@
-from django.urls import path 
+from django.urls import path
 from . import views
 
 app_name = 'restaurant'
@@ -29,5 +29,7 @@ urlpatterns = [
     path('gestCategoria/', views.gest_categoria_view, name="gestionarCategoria"),
     path('gestionarMenu/', views.gest_menu_view, name="gestionarMenu"),
     path('gestConversion/', views.gest_racion_view, name="gestionarCon"),
-    path('gestPedidos/', views.gest_pedido_view, name="gestionarPedido")
+    path('gestPedidos/', views.gest_pedido_view, name="gestionarPedido"),
+    path('verReporte/', views.reporte_emps_view, name='verReporte'),
+    path('reporteRecibo/', views.reporte_recibo, name='repRecibo')
 ]

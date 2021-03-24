@@ -60,16 +60,16 @@ class EmpleadoTb(models.Model):
     def es_admin(self):
         cargos = self.cargotb_set.all()
         cadmin = CargoTb.objects.filter(car_id=1)[0]
-        if cadmin in cargos: 
-            return True 
+        if cadmin in cargos:
+            return True
         else:
             return False
-    
+
     def es_cajero(self):
         cargos = self.cargotb_set.all()
         ccajero = CargoTb.objects.filter(car_id=2)[0]
-        if ccajero in cargos: 
-            return True 
+        if ccajero in cargos:
+            return True
         else:
             return False
 
@@ -104,7 +104,7 @@ class EmpleadoxcargoTb(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'empleadoxcargo_tb'
+        db_table = 'empleadoXCargo_tb'
         unique_together = (('car', 'emp'),)
 
 class ProveedorTb(models.Model):
@@ -134,7 +134,7 @@ class ConversionVenta(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'conversionventa'
+        db_table = 'conversionVenta'
 
 class NotacompraTb(models.Model):
     notc_id = models.AutoField(db_column='notC_id', primary_key=True)  # Field name made lowercase.
@@ -147,12 +147,12 @@ class NotacompraTb(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'notacompra_tb'
+        db_table = 'notaCompra_tb'
 
 
 
 class NcompraxproductoTb(models.Model):
-    ncp_id = models.AutoField(db_column='ncp_id', primary_key=True)  
+    ncp_id = models.AutoField(db_column='ncp_id', primary_key=True)
     ncp_cantidad = models.IntegerField(blank=True, null=True)
     ncp_precio = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     ncp_subt = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
@@ -161,7 +161,7 @@ class NcompraxproductoTb(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'ncompraxproducto_tb'
+        db_table = 'nCompraXProducto_tb'
         unique_together = (('nc', 'prod'),)
 
 class NotaentradaTb(models.Model):
@@ -173,7 +173,7 @@ class NotaentradaTb(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'notaentrada_tb'
+        db_table = 'notaEntrada_tb'
 
 class NentradaxproductoTb(models.Model):
     nep_id = models.AutoField(db_column='nep_id', primary_key=True)
@@ -183,7 +183,7 @@ class NentradaxproductoTb(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'nentradaxproducto_tb'
+        db_table = 'nEntradaXProducto_tb'
         unique_together = (('ne', 'prod'),)
 
 class AlmacenTb(models.Model):
@@ -199,7 +199,7 @@ class LoteTb(models.Model):
     lot_id = models.AutoField(primary_key=True)
     lot_canti = models.IntegerField(db_column='lot_cantI', blank=True, null=True)  # Field name made lowercase.
     lot_fecha = models.DateField(blank=True, null=True)
-    lot_estado = models.IntegerField(db_column='lot_estado', blank=True, null=True)  
+    lot_estado = models.IntegerField(db_column='lot_estado', blank=True, null=True)
     prod = models.ForeignKey(ProductoTb, on_delete= models.CASCADE)
     alm = models.ForeignKey(AlmacenTb, on_delete= models.CASCADE)
     nep = models.ForeignKey(NentradaxproductoTb, on_delete= models.CASCADE)
@@ -215,7 +215,7 @@ class MovimientoloteTb(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'movimientolote_tb'
+        db_table = 'movimientoLote_tb'
 
 class AccionTb(models.Model):
     acc_id = models.AutoField(primary_key=True)
@@ -247,7 +247,7 @@ class NotasalidaTb(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'notasalida_tb'
+        db_table = 'notaSalida_tb'
 
 
 class StockVenta(models.Model):
@@ -256,8 +256,8 @@ class StockVenta(models.Model):
     cv = models.ForeignKey(ConversionVenta, on_delete=models.CASCADE)
     ns = models.ForeignKey(NotasalidaTb, on_delete=models.CASCADE)
     class Meta:
-        managed = False 
-        db_table = 'stockventa'
+        managed = False
+        db_table = 'stockVenta'
 
 class NsalidaxproductoTb(models.Model):
     nsp_id = models.AutoField(db_column='nsp_id', primary_key=True)
@@ -267,7 +267,7 @@ class NsalidaxproductoTb(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'nsalidaxproducto_tb'
+        db_table = 'nSalidaXProducto_tb'
         unique_together = (('nots', 'prod'),)
 
 class PedidoTb(models.Model):
@@ -294,7 +294,7 @@ class Recibo(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'recibo'
+        db_table = 'Recibo'
 
 class Pedidoxmenu(models.Model):
     pm_id = models.AutoField(primary_key=True)
@@ -305,8 +305,8 @@ class Pedidoxmenu(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'pedidoxmenu'
-        unique_together = (('ped', 'men'),)        
+        db_table = 'pedidoXMenu'
+        unique_together = (('ped', 'men'),)
 # fin
 
 

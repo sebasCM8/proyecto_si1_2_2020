@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recibo</title>
+
+<style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+</style>
+</head>
+<body>
+    <div class="container">
+        <h2>Recibo: {{pedido.ped_fecha}}</h2>
+        <hr>
+        <h4>Pedido: {{pedido.ped_id}}</h4>
+        <h4>Nit: {{recibo.nit.nit_dueno}} - {{recibo.nit.nit_numero}}</h4>
+        <hr>
+        <h4>Detalle:</h4>
+        <table>
+            <tr>
+                <th><h4>Menu</h4></th>
+                <th><h4>Precio</h4></th>
+                <th><h4>Cantidad</h4></th>
+                <th><h4>Subtotal</h4></th>
+            </tr>
+                {% for d in detalle%}
+                <tr>
+                    <td>
+                        <label>{{d.men.men_nombre}}</label>
+                    </td>
+                    <td>
+                        <label>{{d.men.men_precio}}</label>
+                    </td>
+                    <td>
+                        <label>{{d.pm_cantidad}}</label>
+                    </td>
+                    <td>
+                        <label>{{d.pm_subtotal}}</label>
+                    </td>
+                </tr>
+                {% endfor %}
+            <tr>
+                <td>
+                    <h4>Total pedido:</h4>
+                </td>
+                <td>
+                    <label>{{pedido.ped_total}}</label>
+               </td>
+            </tr>
+        </table>
+    </div>
+
+</body>
+</html>

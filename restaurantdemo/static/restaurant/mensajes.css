@@ -1,0 +1,13 @@
+.mensaje{
+    width: 90%;
+    margin: auto;
+    background-color: #d6d6c2;
+    height: 100px;
+    padding: auto;
+}
+
+.mensajeTexto{
+    margin: auto;
+    font-size: 1.5em;
+    color: #1a1a1a;
+}
